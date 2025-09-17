@@ -1,8 +1,7 @@
-import { postRouter } from '~/server/api/routers/post';
 import { createCallerFactory, createTRPCRouter } from '~/server/api/trpc';
 import { githubRouter } from './routers/github';
 import { pluginRouter } from './routers/plugin';
-import { voteManagementRouter } from './routers/upvote';
+import { voteManagementRouter } from './routers/voteManagement';
 
 /**
  * This is the primary router for your server.

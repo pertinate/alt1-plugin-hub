@@ -4,8 +4,8 @@ export async function GET() {
     return Response.json({
         appName: 'Plugin Hub',
         description: 'Alt1 React starter kit',
-        appUrl: '/',
-        configUrl: '/alt1/appconfig.json',
+        appUrl: '/plugins',
+        configUrl: '/alt2/appconfig.json',
         iconUrl: '/icon.png',
         defaultWidth: 250,
         defaultHeight: 250,
@@ -15,7 +15,7 @@ export async function GET() {
         maxHeight: 500,
         requestHandlers: [],
         activators: [],
-        // permissions: '',
+        permissions: '',
     });
 }
 //alt1://addapp/http://localhost:3000/alt1/appconfig.json

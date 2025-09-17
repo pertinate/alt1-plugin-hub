@@ -1,0 +1,38 @@
+import { addPluginHubLink } from '~/lib/alt1';
+import { ThemeToggle } from './theme-toggle';
+import { Button } from './ui/button';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from './ui/dropdown-menu';
+import Link from 'next/link';
+import { auth } from '~/server/auth';
+
+export const AppHeader = async () => {
+    await auth();
+    return (
+        <div className='flex items-center justify-between px-2 pt-2'>
+            <h1 className='scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance'>Plugin Hub</h1>
+
+            <div className='flex gap-2'>
+                <Button variant={'outline'} asChild>
+                    <Link href={'/plugins'}>My Repos</Link>
+                </Button>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant={'outline'}>Help</Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        <DropdownMenuItem>Discord</DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link href={addPluginHubLink()}>Add to Alt1</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link href={'http://localhost:3000'} target='_blank' rel='noopener noreferrer'>
+                                Open in Browser
+                            </Link>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+                <ThemeToggle />
+            </div>
+        </div>
+    );
+};

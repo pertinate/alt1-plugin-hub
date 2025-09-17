@@ -68,6 +68,7 @@ import {
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
@@ -79,6 +80,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { HomeIcon, PlusIcon } from 'lucide-react';
 import Link from 'next/link';
+import { UpdatePlugin } from './updatePlugin';
+import { Dialog } from './ui/dialog';
+import DeletePluginBtn from './deletePluginBtn';
 //#endregion
 
 export const schema = z.object({
@@ -125,7 +129,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
         accessorKey: 'name',
         header: 'Name',
         cell: ({ row }) => {
-            return <Label>{row.original.name}</Label>;
+            return <Link href={`/plugins/${row.original.id}`}>{row.original.name}</Link>;
         },
         enableHiding: false,
     },
@@ -174,26 +178,30 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     },
     {
         id: 'actions',
-        cell: () => (
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button
-                        variant='ghost'
-                        className='data-[state=open]:bg-muted text-muted-foreground flex size-8'
-                        size='icon'
-                    >
-                        <IconDotsVertical />
-                        <span className='sr-only'>Open menu</span>
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align='end' className='w-32'>
-                    <DropdownMenuItem>Edit</DropdownMenuItem>
-                    <DropdownMenuItem>Make a copy</DropdownMenuItem>
-                    <DropdownMenuItem>Favorite</DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem variant='destructive'>Delete</DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
+        cell: ({ row }) => (
+            <Dialog>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button
+                            variant='ghost'
+                            className='data-[state=open]:bg-muted text-muted-foreground flex size-8'
+                            size='icon'
+                        >
+                            <IconDotsVertical />
+                            <span className='sr-only'>Open menu</span>
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align='end' className='w-32'>
+                        <DropdownMenuLabel>
+                            <UpdatePlugin id={row.original.id} />
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel>
+                            <DeletePluginBtn id={row.original.id} />
+                        </DropdownMenuLabel>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </Dialog>
         ),
     },
 ];
@@ -221,19 +229,7 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
     );
 }
 
-export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[] }) {
-    const [data, setData] = React.useState<typeof initialData>(() => [
-        {
-            id: 0,
-            name: 'plugin test',
-            appConfig: 'https://techpure.dev/RS3QuestBuddy/appconfig.prod.json',
-            readMe: 'https://raw.githubusercontent.com/Techpure2013/RS3QuestBuddy/refs/heads/master/README.md',
-            category: [],
-            status: 'In Progress',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        },
-    ]);
+export function DataTable({ data }: { data: z.infer<typeof schema>[] }) {
     const [rowSelection, setRowSelection] = React.useState({});
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -272,17 +268,6 @@ export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[
         getFacetedUniqueValues: getFacetedUniqueValues(),
     });
 
-    function handleDragEnd(event: DragEndEvent) {
-        const { active, over } = event;
-        if (active && over && active.id !== over.id) {
-            setData(data => {
-                const oldIndex = dataIds.indexOf(active.id);
-                const newIndex = dataIds.indexOf(over.id);
-                return arrayMove(data, oldIndex, newIndex);
-            });
-        }
-    }
-
     return (
         // <Tabs defaultValue='outline' className='w-full flex-col justify-start gap-6'>
 
@@ -292,7 +277,6 @@ export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[
                 <DndContext
                     collisionDetection={closestCenter}
                     modifiers={[restrictToVerticalAxis]}
-                    onDragEnd={handleDragEnd}
                     sensors={sensors}
                     id={sortableId}
                 >

@@ -17,6 +17,7 @@ export const plugins = createTable('plugins', d => ({
     readMe: d.text(),
     category: d.text().array(),
     status: d.varchar({ length: 255 }),
+    disabled: d.boolean(),
     createdById: d
         .varchar({ length: 255 })
         .notNull()
@@ -31,8 +32,8 @@ export const plugins = createTable('plugins', d => ({
 export const comments = createTable('comments', d => ({
     id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
     message: d.text(),
-    plugin: d
-        .varchar({ length: 255 })
+    pluginId: d
+        .integer()
         .notNull()
         .references(() => plugins.id),
     createdById: d
@@ -55,7 +56,7 @@ export const votes = createTable(
             .notNull()
             .references(() => users.id),
         pluginId: d
-            .varchar({ length: 255 })
+            .integer()
             .notNull()
             .references(() => plugins.id),
         createdAt: d
@@ -64,7 +65,7 @@ export const votes = createTable(
             .notNull(),
         value: d.smallint().notNull(), // +1 for upvote, -1 for downvote
     }),
-    table => [unique('userPluginUnique').on(table.createdById, table.pluginId)]
+    table => [unique('userPluginUnique_votes').on(table.createdById, table.pluginId)]
 );
 
 export const pluginMetadata = createTable(
@@ -76,7 +77,7 @@ export const pluginMetadata = createTable(
             .notNull()
             .references(() => users.id),
         pluginId: d
-            .varchar({ length: 255 })
+            .integer()
             .notNull()
             .references(() => plugins.id),
         createdAt: d
@@ -87,7 +88,7 @@ export const pluginMetadata = createTable(
         name: d.text(),
         value: d.text(),
     }),
-    table => [unique('userPluginUnique').on(table.createdById, table.name)]
+    table => [unique('userPluginUnique_meta').on(table.pluginId, table.name)]
 );
 
 export const users = createTable('user', d => ({
@@ -106,6 +107,7 @@ export const users = createTable('user', d => ({
         .default(sql`CURRENT_TIMESTAMP`),
     image: d.varchar({ length: 255 }),
     username: d.varchar({ length: 255 }),
+    disabled: d.boolean(),
 }));
 
 export const usersRelations = relations(users, ({ many }) => ({
