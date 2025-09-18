@@ -29,6 +29,10 @@ export async function generateMetadata({ params, searchParams }: Props, parent: 
         return {
             title: 'PluginHub - Plugin does not exist',
             description: 'Plugin does not exist',
+            openGraph: {
+                title: 'PluginHub - Plugin does not exist',
+                description: 'Plugin does not exist',
+            },
         };
     }
 
@@ -37,6 +41,10 @@ export async function generateMetadata({ params, searchParams }: Props, parent: 
     return {
         title: `PluginHub - ${plugin.name}`,
         description: appConfigContents.description,
+        openGraph: {
+            title: `PluginHub - ${plugin.name}`,
+            description: appConfigContents.description,
+        },
     };
 }
 
