@@ -34,24 +34,26 @@ export const voteManagementRouter = createTRPCRouter({
         }),
     getVotes: publicProcedure.input(z.number()).query(async ({ ctx, input }) => {
         // console.log(ctx.headers, ctx.session)
-        return await ctx.db
-            .select({
-                pluginId: plugins.id,
-                name: plugins.name,
-                appConfig: plugins.appConfig,
-                upvotes: sql<number>`SUM(CASE WHEN ${votes.value} = 1 THEN 1 ELSE 0 END)`,
-                downvotes: sql<number>`SUM(CASE WHEN ${votes.value} = -1 THEN 1 ELSE 0 END)`,
-                total: sql<number>`SUM(${votes.value})`,
-                userVote: ctx.session?.user.id
-                    ? sql<
-                          number | null
-                      >`MAX(CASE WHEN ${votes.createdById} = ${ctx.session?.user.id} THEN ${votes.value} ELSE NULL END)`
-                    : sql<number | null>`NULL`,
-            })
-            .from(plugins)
-            .leftJoin(votes, eq(votes.pluginId, plugins.id))
-            .where(eq(plugins.id, input))
-            .groupBy(plugins.id, plugins.name, plugins.appConfig);
+        return (
+            await ctx.db
+                .select({
+                    pluginId: plugins.id,
+                    name: plugins.name,
+                    appConfig: plugins.appConfig,
+                    upvotes: sql<number>`SUM(CASE WHEN ${votes.value} = 1 THEN 1 ELSE 0 END)`,
+                    downvotes: sql<number>`SUM(CASE WHEN ${votes.value} = -1 THEN 1 ELSE 0 END)`,
+                    total: sql<number>`SUM(${votes.value})`,
+                    userVote: ctx.session?.user.id
+                        ? sql<
+                              number | null
+                          >`MAX(CASE WHEN ${votes.createdById} = ${ctx.session?.user.id} THEN ${votes.value} ELSE NULL END)`
+                        : sql<number | null>`NULL`,
+                })
+                .from(plugins)
+                .leftJoin(votes, eq(votes.pluginId, plugins.id))
+                .where(eq(plugins.id, input))
+                .groupBy(plugins.id, plugins.name, plugins.appConfig)
+        )[0];
     }),
     getTopVoted: publicProcedure.query(async ({ ctx }) => {
         const [dailyTop, weeklyTop, monthlyTop] = await Promise.all([

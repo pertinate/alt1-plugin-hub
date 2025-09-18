@@ -64,7 +64,7 @@ export const PluginCategory = z.enum(allCategories);
 export const MetaSupportSchema = z.object({
     id: z.number().optional(),
     type: z.literal('Support'),
-    value: z.string().url(), // value must be a valid URL when type is "Support"
+    value: z.string().url().url({ message: 'Must be a valid URL' }), // value must be a valid URL when type is "Support"
     name: z.string(),
 });
 
@@ -79,10 +79,10 @@ export const MetadataSchema = z.discriminatedUnion('type', [MetaSupportSchema, M
 
 export const pluginSchema = z.object({
     name: z.string(),
-    appConfig: z.string().url(),
-    readMe: z.string().url(),
-    metadata: z.array(MetadataSchema),
-    category: z.set(PluginCategory),
+    appConfig: z.string().url().url({ message: 'Must be a valid URL' }),
+    readMe: z.string().url().url({ message: 'Must be a valid URL' }),
+    metadata: z.array(MetadataSchema).max(15),
+    category: z.array(PluginCategory).max(10),
     status: z.union([z.literal('In Development'), z.literal('Published')]),
 });
 

@@ -1,6 +1,7 @@
 'use client';
 
-import { useForm } from '@tanstack/react-form';
+import { useFieldArray, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Label } from './ui/label';
 import { api, type RouterOutputs } from '~/trpc/react'; // <-- tRPC client hook
 import { Button } from './ui/button';
@@ -37,6 +38,7 @@ import { useState } from 'react';
 import { cn } from '~/lib/utils';
 
 const categories = Object.values(PluginCategory.options); // your RS3Skills + OtherCategories union
+const updateWithoutId = updatePluginSchema.omit({ id: true });
 
 function UpdatePluginForm({ plugin }: { plugin: RouterOutputs['plugin']['getPlugin'][number] }) {
     const utils = api.useUtils();
@@ -46,216 +48,201 @@ function UpdatePluginForm({ plugin }: { plugin: RouterOutputs['plugin']['getPlug
             utils.plugin.getCreatedPlugins.refetch();
         },
     });
-    const form = useForm({
+
+    const {
+        register,
+        handleSubmit,
+        reset,
+        control,
+        setValue,
+        watch,
+        formState: { errors },
+    } = useForm({
         defaultValues: {
-            id: plugin.id!,
             name: plugin.name!,
             appConfig: plugin.appConfig!,
             readMe: plugin.readMe!,
             metadata: plugin.metadata! as z.infer<typeof updatePluginSchema>['metadata'],
             category: plugin.category! as typeof categories,
             status: plugin.status! as z.infer<typeof updatePluginSchema>['status'],
-        } satisfies z.infer<typeof updatePluginSchema>,
-        validators: {
-            onChange: updatePluginSchema,
-        },
-        onSubmit: async values => {
-            await mutation.mutateAsync({
-                ...values.value,
-                category: values.value.category,
-                metadata: values.value.metadata,
-                id: plugin.id,
-            });
-        },
+        } satisfies z.infer<typeof updateWithoutId>,
+        resolver: zodResolver(pluginSchema),
+    });
+
+    const status = watch('status');
+    const category = watch('category');
+
+    const metadata = useFieldArray({
+        control,
+        name: 'metadata',
     });
 
     return (
         <DialogContent>
             <DialogHeader>
-                <DialogTitle>Edit Plugin</DialogTitle>
-                <DialogDescription>Fill out the form to edit this plugin.</DialogDescription>
+                <DialogTitle>New Plugin</DialogTitle>
+                <DialogDescription>Fill out the form to create a new plugin.</DialogDescription>
             </DialogHeader>
             <form
                 className='space-y-4'
-                onSubmit={e => {
-                    e.preventDefault();
-                    form.handleSubmit(e);
-                }}
+                onSubmit={handleSubmit(async values => {
+                    await mutation.mutateAsync({
+                        ...values,
+                        id: plugin.id,
+                    });
+                })}
             >
-                <form.Field name='name'>
-                    {field => (
-                        <div>
-                            <Label htmlFor='name'>Name</Label>
-                            <Input
-                                id='name'
-                                value={field.state.value}
-                                onChange={e => field.setValue(e.target.value)}
-                                required
-                            />
-                            {field.state.meta.errors[0] && <p className='text-sm text-red-500'>{field.state.value}</p>}
-                        </div>
-                    )}
-                </form.Field>
-
-                <form.Field name='appConfig'>
-                    {field => (
-                        <div>
-                            <Label htmlFor='appConfig'>App Config URL</Label>
-                            <Input
-                                id='appConfig'
-                                type='url'
-                                value={field.state.value}
-                                onChange={e => field.setValue(e.target.value)}
-                                required
-                            />
-                        </div>
-                    )}
-                </form.Field>
-
-                <form.Field name='readMe'>
-                    {field => (
-                        <div>
-                            <Label htmlFor='readMe'>ReadMe URL</Label>
-                            <Input
-                                id='readMe'
-                                type='url'
-                                value={field.state.value}
-                                onChange={e => field.setValue(e.target.value)}
-                                required
-                            />
-                        </div>
-                    )}
-                </form.Field>
+                <div>
+                    <Label htmlFor='name'>Name</Label>
+                    <Input
+                        id='name'
+                        {...register('name')}
+                        // value={field.state.value}
+                        // onChange={e => field.setValue(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <Label htmlFor='appConfig'>App Config URL</Label>
+                    <Input
+                        id='appConfig'
+                        // type='url'
+                        {...register('appConfig')}
+                        // value={field.state.value}
+                        // onChange={e => field.setValue(e.target.value)}
+                        required
+                    />
+                    {errors.appConfig && <Label className='text-destructive text-sm'>{errors.appConfig.message}</Label>}
+                </div>
+                <div className='flex flex-col gap-2'>
+                    <Label htmlFor='readMe'>ReadMe URL</Label>
+                    <Input
+                        id='readMe'
+                        // type='url'
+                        {...register('readMe')}
+                        // value={field.state.value}
+                        // onChange={e => field.setValue(e.target.value)}
+                        required
+                    />
+                    {errors.readMe && <Label className='text-destructive text-sm'>{errors.readMe.message}</Label>}
+                </div>
 
                 <div>
                     <Label>Metadata</Label>
 
                     <div className='space-y-2'>
-                        <form.Field name='metadata' mode='array' validators={{ onSubmit: z.array(MetadataSchema) }}>
-                            {field => {
+                        <div className='mt-2 flex max-h-64 flex-col gap-4 overflow-auto'>
+                            {metadata.fields.map((fieldItem, index) => {
+                                const type = watch(`metadata.${index}.type`);
                                 return (
-                                    <div className='mt-2 flex flex-col gap-4'>
-                                        {field.state.value.map((fieldItem, index) => (
-                                            <div
-                                                key={`${fieldItem.type}.${fieldItem.name}.${index}`}
-                                                className='flex items-center gap-2'
+                                    <div className='relative'>
+                                        <div className='flex items-center gap-2'>
+                                            <Select
+                                                value={type}
+                                                onValueChange={value =>
+                                                    setValue(
+                                                        `metadata.${index}.type`,
+                                                        value as z.infer<
+                                                            typeof pluginSchema
+                                                        >['metadata'][number]['type'],
+                                                        {
+                                                            shouldValidate: true,
+                                                        }
+                                                    )
+                                                }
                                             >
-                                                <form.Field name={`metadata[${index}].type`}>
-                                                    {f => (
-                                                        <Select
-                                                            onValueChange={value => f.handleChange(value as any)}
-                                                            defaultValue={f.state.value}
-                                                        >
-                                                            <SelectTrigger>
-                                                                <SelectValue placeholder='Type' />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                <SelectItem value='Support'>Support</SelectItem>
-                                                                <SelectItem value='Info'>Info</SelectItem>
-                                                            </SelectContent>
-                                                        </Select>
-                                                    )}
-                                                </form.Field>
-
-                                                <form.Field name={`metadata[${index}].name`}>
-                                                    {f => (
-                                                        <Input
-                                                            placeholder='Name'
-                                                            value={f.state.value}
-                                                            onChange={e => f.setValue(e.target.value)}
-                                                        />
-                                                    )}
-                                                </form.Field>
-
-                                                <form.Field name={`metadata[${index}].value`}>
-                                                    {f => (
-                                                        <div>
-                                                            <Input
-                                                                placeholder='Value'
-                                                                value={f.state.value}
-                                                                onChange={e => f.setValue(e.target.value)}
-                                                            />
-                                                            <Label className='absolute left-8 text-red-400'>
-                                                                {f.state.meta.errors.map(entry => entry?.message)}
-                                                            </Label>
-                                                        </div>
-                                                    )}
-                                                </form.Field>
-
-                                                <Button
-                                                    type='button'
-                                                    variant='destructive'
-                                                    onClick={() => field.removeValue(index)}
-                                                >
-                                                    Remove
-                                                </Button>
-                                            </div>
-                                        ))}
-                                        <Button
-                                            type='button'
-                                            variant='secondary'
-                                            className='mt-2'
-                                            onClick={() => field.pushValue({ type: 'Support', name: '', value: '' })}
-                                        >
-                                            + Add Metadata
-                                        </Button>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder='Type' />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value='Support'>Support</SelectItem>
+                                                    <SelectItem value='Info'>Info</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <Input placeholder='Name' {...register(`metadata.${index}.name`)} />
+                                            <Input placeholder='Value' {...register(`metadata.${index}.value`)} />
+                                            <Button
+                                                type='button'
+                                                variant='destructive'
+                                                onClick={() => metadata.remove(index)}
+                                            >
+                                                Remove
+                                            </Button>
+                                        </div>
+                                        {errors.metadata?.[index]?.value && (
+                                            <Label className='text-destructive text-sm'>
+                                                {errors.metadata[index]?.value?.message}
+                                            </Label>
+                                        )}
                                     </div>
                                 );
-                            }}
-                        </form.Field>
+                            })}
+                        </div>
+                        <Button
+                            type='button'
+                            variant='secondary'
+                            className='mt-2 w-full'
+                            onClick={() =>
+                                metadata.fields.length < 15 && metadata.append({ type: 'Support', name: '', value: '' })
+                            }
+                        >
+                            + Add Metadata
+                        </Button>
                     </div>
                 </div>
 
                 {/* Category multi-select */}
-                <form.Field name='category'>
-                    {field => (
-                        <div className='z-10'>
-                            <Label>Category</Label>
-                            <MultiSelect
-                                onValuesChange={value => field.handleChange(value as any)}
-                                defaultValues={Array.from(field.state.value)}
-                            >
-                                <MultiSelectTrigger className='w-full max-w-[400px]'>
-                                    <MultiSelectValue placeholder='Select Categories...' />
-                                </MultiSelectTrigger>
-                                <MultiSelectContent>
-                                    <MultiSelectGroup>
-                                        {categories.map(cat => (
-                                            <MultiSelectItem key={cat} value={cat}>
-                                                {cat}
-                                            </MultiSelectItem>
-                                        ))}
-                                    </MultiSelectGroup>
-                                </MultiSelectContent>
-                            </MultiSelect>
-                        </div>
-                    )}
-                </form.Field>
+                <div className='z-10 flex flex-col gap-2'>
+                    <Label>Category</Label>
+                    <MultiSelect
+                        values={category}
+                        onValuesChange={values =>
+                            setValue('category', values as z.infer<typeof pluginSchema>['category'], {
+                                shouldValidate: true,
+                            })
+                        }
+                    >
+                        <MultiSelectTrigger className='w-full max-w-[400px]'>
+                            <MultiSelectValue placeholder='Select Categories...' />
+                        </MultiSelectTrigger>
+                        <MultiSelectContent>
+                            <MultiSelectGroup>
+                                {categories.map(cat => (
+                                    <MultiSelectItem key={cat} value={cat}>
+                                        {cat}
+                                    </MultiSelectItem>
+                                ))}
+                            </MultiSelectGroup>
+                        </MultiSelectContent>
+                    </MultiSelect>
+                </div>
 
                 {/* Status select */}
-                <form.Field name='status'>
-                    {field => (
-                        <div>
-                            <Label>Status</Label>
+                <div className='flex flex-col gap-2'>
+                    <Label>Status</Label>
 
-                            <Select
-                                onValueChange={value => field.handleChange(value as any)}
-                                defaultValue={field.state.value}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder='Status...' />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value='In Development'>In Development</SelectItem>
-                                    <SelectItem value='Published'>Published</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    )}
-                </form.Field>
+                    <Select
+                        value={status}
+                        onValueChange={value =>
+                            setValue('status', value as z.infer<typeof pluginSchema>['status'], {
+                                shouldValidate: true,
+                            })
+                        }
+                    >
+                        <SelectTrigger>
+                            <SelectValue placeholder='Status...' />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value='In Development'>In Development</SelectItem>
+                            <SelectItem value='Published'>Published</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
 
                 <div className='flex w-full flex-col'>
-                    <Button disabled={mutation.isPending}>{mutation.isPending ? 'Updating...' : 'Update'}</Button>
+                    <Button type='submit' disabled={mutation.isPending}>
+                        {mutation.isPending ? 'Creating...' : 'Create'}
+                    </Button>
                 </div>
             </form>
         </DialogContent>

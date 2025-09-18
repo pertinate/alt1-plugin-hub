@@ -6,6 +6,9 @@ import { Geist } from 'next/font/google';
 import { TRPCReactProvider } from '~/trpc/react';
 import { ThemeProvider } from '~/components/theme-provider';
 import { AppHeader } from '~/components/appHeader';
+import { Button } from '~/components/ui/button';
+import { Heart } from 'lucide-react';
+import { FABDonate } from '~/components/fabDonate';
 
 export const metadata: Metadata = {
     title: 'Create T3 App',
@@ -29,6 +32,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
                     </ThemeProvider>
                 </TRPCReactProvider>
                 <div id={'portal'} />
+                <FABDonate />
             </body>
         </html>
     );

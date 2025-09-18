@@ -82,6 +82,10 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                         </CardHeader>
                         <CardContent>
                             <div className='flex flex-col gap-4'>
+                                <div className='flex flex-col gap-2'>
+                                    <Label className='text-md font-extrabold'>Author</Label>
+                                    <Label className='text-xlg font-extralight'>{plugin.createByUser}</Label>
+                                </div>
                                 {plugin.metadata
                                     .filter(entry => entry.type == 'Info')
                                     .map(entry => (
@@ -90,10 +94,6 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                                             <Label className='text-xlg font-extralight'>{entry.value}</Label>
                                         </div>
                                     ))}
-                                <div className='flex flex-col gap-2'>
-                                    <Label className='text-md font-extrabold'>Author</Label>
-                                    <Label className='text-xlg font-extralight'>Techpure</Label>
-                                </div>
                             </div>
                         </CardContent>
                     </Card>
@@ -112,9 +112,6 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                                             </Link>
                                         </Button>
                                     ))}
-                                <Button variant={'outline'}>Github</Button>
-                                <Button variant={'outline'}>Discord</Button>
-                                <Button variant={'outline'}>Forum</Button>
                             </div>
                         </CardContent>
                     </Card>

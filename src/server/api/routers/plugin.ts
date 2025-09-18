@@ -6,7 +6,7 @@ import { getAppConfigs, getUserRepos, type GithubRepositoryInfo } from '~/lib/gi
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '~/server/api/trpc';
 import { createPlugin } from '../dataGroups/createPlugin';
-import { pluginMetadata, plugins, votes } from '~/server/db/schema';
+import { pluginMetadata, plugins, users, votes } from '~/server/db/schema';
 import { and, desc, eq, lt, sql } from 'drizzle-orm';
 import { fetchAlt1Config } from '~/util/fetchAlt1Config';
 import { updatePlugin } from '../dataGroups/updatePlugin';
@@ -69,11 +69,13 @@ export const pluginRouter = createTRPCRouter({
                     '[]'
                 )
                 `,
+                createByUser: users.name,
             })
             .from(plugins)
             .leftJoin(pluginMetadata, eq(pluginMetadata.pluginId, plugins.id))
+            .leftJoin(users, eq(users.id, plugins.createdById))
             .where(eq(plugins.id, input))
-            .groupBy(plugins.id);
+            .groupBy(users.name, plugins.id);
     }),
     getPlugins: publicProcedure
         .input(
