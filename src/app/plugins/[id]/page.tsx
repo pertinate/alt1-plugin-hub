@@ -98,7 +98,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                     </Card>
                     <Card>
                         <CardHeader>
-                            <CardTitle>Support</CardTitle>
+                            <CardTitle>Links</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className='flex flex-col gap-4'>

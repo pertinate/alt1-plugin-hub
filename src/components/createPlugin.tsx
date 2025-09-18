@@ -86,7 +86,7 @@ export function CreatePlugin() {
                     <span className='hidden lg:inline'>New</span>
                 </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent onInteractOutside={e => e.preventDefault()}>
                 <DialogHeader>
                     <DialogTitle>New Plugin</DialogTitle>
                     <DialogDescription>Fill out the form to create a new plugin.</DialogDescription>
