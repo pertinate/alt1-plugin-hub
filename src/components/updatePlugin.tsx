@@ -15,15 +15,9 @@ import {
     DialogTrigger,
 } from './ui/dialog';
 import { Input } from './ui/input';
+import { Badge } from './ui/badge';
 import z from 'zod';
-import {
-    MetadataSchema,
-    MetaInfoSchema,
-    MetaSupportSchema,
-    PluginCategory,
-    pluginSchema,
-    updatePluginSchema,
-} from '~/server/api/dataGroups/pluginTypes';
+import { PluginCategory, pluginSchema, updatePluginSchema } from '~/server/api/dataGroups/pluginTypes';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import {
     MultiSelect,
@@ -80,19 +74,27 @@ function UpdatePluginForm({ plugin }: { plugin: RouterOutputs['plugin']['getPlug
     return (
         <DialogContent>
             <DialogHeader>
-                <DialogTitle>New Plugin</DialogTitle>
+                <DialogTitle className='flex gap-4'>
+                    <>New Plugin</>
+                    {mutation.isSuccess && (
+                        <Badge variant='secondary' className='bg-green-500 text-white hover:bg-green-600'>
+                            Success
+                        </Badge>
+                    )}
+                </DialogTitle>
                 <DialogDescription>Fill out the form to create a new plugin.</DialogDescription>
             </DialogHeader>
             <form
                 className='space-y-4'
                 onSubmit={handleSubmit(async values => {
+                    console.log(values);
                     await mutation.mutateAsync({
                         ...values,
                         id: plugin.id,
                     });
                 })}
             >
-                <div>
+                <div className='flex flex-col gap-2'>
                     <Label htmlFor='name'>Name</Label>
                     <Input
                         id='name'
@@ -102,7 +104,7 @@ function UpdatePluginForm({ plugin }: { plugin: RouterOutputs['plugin']['getPlug
                         required
                     />
                 </div>
-                <div>
+                <div className='flex flex-col gap-2'>
                     <Label htmlFor='appConfig'>App Config URL</Label>
                     <Input
                         id='appConfig'
@@ -241,7 +243,7 @@ function UpdatePluginForm({ plugin }: { plugin: RouterOutputs['plugin']['getPlug
 
                 <div className='flex w-full flex-col'>
                     <Button type='submit' disabled={mutation.isPending}>
-                        {mutation.isPending ? 'Creating...' : 'Create'}
+                        {mutation.isPending ? 'Updating...' : 'Update'}
                     </Button>
                 </div>
             </form>

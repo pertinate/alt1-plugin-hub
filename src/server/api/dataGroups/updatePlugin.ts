@@ -11,8 +11,6 @@ export const updatePlugin = protectedProcedure
         })
     )
     .mutation(async ({ ctx, input }) => {
-        // console.log(ctx.headers, ctx.session)
-        console.log(input);
         return await ctx.db.transaction(async tx => {
             const [plugin] = await tx
                 .update(plugins)
@@ -29,7 +27,7 @@ export const updatePlugin = protectedProcedure
                 .where(and(eq(plugins.id, input.id), eq(plugins.createdById, ctx.session.user.id)))
                 .returning();
 
-            if (plugin) {
+            if (plugin && input.metadata.length > 0) {
                 await tx
                     .insert(pluginMetadata)
                     .values(
