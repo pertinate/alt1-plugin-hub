@@ -48,6 +48,7 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
     errorFormatter({ shape, error }) {
         return {
             ...shape,
+            message: process.env.NODE_ENV === 'production' ? 'Something went wrong' : shape.message,
             data: {
                 ...shape.data,
                 zodError: error.cause instanceof ZodError ? error.cause.flatten() : null,
