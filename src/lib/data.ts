@@ -1,5 +1,6 @@
 import { cache } from 'react';
 import { api } from '~/trpc/server';
+import type { Alt1Config } from './alt1';
 
 export const getReadme = cache(async (url: string) => {
     return await (await fetch(url)).text();
