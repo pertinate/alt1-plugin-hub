@@ -1,11 +1,10 @@
-import { ChevronLeft, ThumbsDown, ThumbsUp } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { api, HydrateClient } from '~/trpc/server';
 
 import 'github-markdown-css/github-markdown-light.css';
 import 'github-markdown-css/github-markdown-dark.css';
-import MarkdownRenderer from '~/app/_components/markdown';
 import Link from 'next/link';
 import type { Alt1Config } from '~/lib/alt1';
 import { Label } from '~/components/ui/label';

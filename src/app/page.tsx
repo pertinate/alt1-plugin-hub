@@ -1,37 +1,7 @@
-import Link from 'next/link';
-
-import { LatestPost } from '~/app/_components/post';
-import { ThemeToggle } from '~/components/theme-toggle';
-import { Button } from '~/components/ui/button';
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '~/components/ui/context-menu';
-import {
-    Card,
-    CardAction,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '~/components/ui/card';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '~/components/ui/dropdown-menu';
-import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group';
-import { Input } from '~/components/ui/input';
-import { Label } from '~/components/ui/label';
-import { addPluginHubLink } from '~/lib/alt1';
-import { auth } from '~/server/auth';
+import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { api, HydrateClient } from '~/trpc/server';
-import { ArrowDown, ArrowUp, ThumbsDown, ThumbsUp } from 'lucide-react';
-import { headers } from 'next/headers';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '~/components/ui/collapsible';
 import { BannerWrapper } from '~/components/bannerWrapper';
-import { Ribbon } from '~/components/ribbon';
 import { PluginCard } from '~/components/pluginCard';
 import PluginList from './_components/pluginList';
 

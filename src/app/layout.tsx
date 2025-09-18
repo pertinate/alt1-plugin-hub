@@ -6,8 +6,6 @@ import { Geist } from 'next/font/google';
 import { TRPCReactProvider } from '~/trpc/react';
 import { ThemeProvider } from '~/components/theme-provider';
 import { AppHeader } from '~/components/appHeader';
-import { Button } from '~/components/ui/button';
-import { Heart } from 'lucide-react';
 import { FABDonate } from '~/components/fabDonate';
 
 export const metadata: Metadata = {
