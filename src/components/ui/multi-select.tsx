@@ -154,6 +154,7 @@ export function MultiSelectValue({
                 break;
             }
             amount = items.length - i;
+            //@ts-ignore
             child.style.display = 'none';
             overflowElement?.style.removeProperty('display');
         }

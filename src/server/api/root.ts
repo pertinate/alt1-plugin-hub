@@ -1,5 +1,4 @@
 import { createCallerFactory, createTRPCRouter } from '~/server/api/trpc';
-import { githubRouter } from './routers/github';
 import { pluginRouter } from './routers/plugin';
 import { voteManagementRouter } from './routers/voteManagement';
 
@@ -9,7 +8,6 @@ import { voteManagementRouter } from './routers/voteManagement';
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
-    github: githubRouter,
     plugin: pluginRouter,
     votes: voteManagementRouter,
 });

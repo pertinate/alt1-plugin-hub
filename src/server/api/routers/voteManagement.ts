@@ -3,7 +3,6 @@ import { desc, eq, gte, sql } from 'drizzle-orm';
 import { writeFileSync } from 'fs';
 import { z } from 'zod';
 import type { Alt1Config } from '~/lib/alt1';
-import { getAppConfigs, getUserRepos, type GithubRepositoryInfo } from '~/lib/github';
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '~/server/api/trpc';
 import { plugins, votes } from '~/server/db/schema';
