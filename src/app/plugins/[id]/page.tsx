@@ -15,12 +15,12 @@ import MDRender from '~/components/MDRender';
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
 
-    const session = await auth();
+    // const session = await auth();
 
-    if (!session) {
-        // This will redirect on the server
-        redirect('/api/auth/signin'); // or "/api/auth/signin" if using next-auth
-    }
+    // if (!session) {
+    //     // This will redirect on the server
+    //     redirect('/api/auth/signin'); // or "/api/auth/signin" if using next-auth
+    // }
 
     const plugins = await api.plugin.getPlugin(Number(id));
 
