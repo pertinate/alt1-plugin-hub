@@ -8,21 +8,42 @@ import 'github-markdown-css/github-markdown-dark.css';
 import Link from 'next/link';
 import type { Alt1Config } from '~/lib/alt1';
 import { Label } from '~/components/ui/label';
-import { auth } from '~/server/auth';
-import { redirect } from 'next/navigation';
 import MDRender from '~/components/MDRender';
+import { cache } from 'react';
+import type { Metadata, ResolvingMetadata } from 'next';
+import { getAppconfig, getPlugin, getReadme } from '~/lib/data';
+
+type Props = {
+    params: Promise<{ id: string }>;
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+export async function generateMetadata({ params, searchParams }: Props, parent: ResolvingMetadata): Promise<Metadata> {
+    const id = Number((await params).id);
+
+    const plugins = await getPlugin(id);
+
+    const plugin = plugins[0];
+
+    if (!plugin) {
+        return {
+            title: 'PluginHub - Plugin does not exist',
+            description: 'Plugin does not exist',
+        };
+    }
+
+    const appConfigContents = await getAppconfig(plugin.appConfig!);
+
+    return {
+        title: `PluginHub - ${plugin.name}`,
+        description: appConfigContents.description,
+    };
+}
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
 
-    // const session = await auth();
-
-    // if (!session) {
-    //     // This will redirect on the server
-    //     redirect('/api/auth/signin'); // or "/api/auth/signin" if using next-auth
-    // }
-
-    const plugins = await api.plugin.getPlugin(Number(id));
+    const plugins = await getPlugin(Number(id));
 
     const plugin = plugins[0];
 
@@ -30,9 +51,9 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         return undefined;
     }
 
-    const readMeContents = await (await fetch(plugin.readMe!)).text();
+    const readMeContents = await getReadme(plugin.readMe!);
 
-    const appConfigContents = (await (await fetch(plugin.appConfig!)).json()) as Alt1Config;
+    const appConfigContents = await getAppconfig(plugin.appConfig!);
 
     return (
         <HydrateClient>
