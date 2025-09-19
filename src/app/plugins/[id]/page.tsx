@@ -15,41 +15,23 @@ import { getAppconfig, getPlugin, getReadme } from '~/lib/data';
 
 type Props = {
     params: Promise<{ id: string }>;
-    searchParams: Promise<Record<string, string | string[] | undefined>>;
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-export async function generateMetadata({ params }: Props, parent: ResolvingMetadata): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: Props, parent: ResolvingMetadata): Promise<Metadata> {
     const id = Number((await params).id);
 
     const plugins = await getPlugin(id);
-    const plugin = plugins[0];
 
-    // shared icons (favicon & apple touch icon)
-    const icons = [
-        { rel: 'icon', url: '/icon.png' },
-        { rel: 'apple-touch-icon', url: '/icon.png' },
-    ];
+    const plugin = plugins[0];
 
     if (!plugin) {
         return {
             title: 'PluginHub - Plugin does not exist',
             description: 'Plugin does not exist',
-            icons,
             openGraph: {
                 title: 'PluginHub - Plugin does not exist',
                 description: 'Plugin does not exist',
-                images: [
-                    {
-                        url: '/icon.png', // static fallback OG image
-                        width: 1200,
-                        height: 630,
-                        alt: 'PluginHub preview image',
-                    },
-                ],
-            },
-            twitter: {
-                card: 'summary_large_image',
-                images: ['/icon.png'],
             },
         };
     }
@@ -59,22 +41,9 @@ export async function generateMetadata({ params }: Props, parent: ResolvingMetad
     return {
         title: `PluginHub - ${plugin.name}`,
         description: appConfigContents.description,
-        icons,
         openGraph: {
             title: `PluginHub - ${plugin.name}`,
             description: appConfigContents.description,
-            images: [
-                {
-                    url: '/icon.png', // or generate a plugin-specific image if you have one
-                    width: 1200,
-                    height: 630,
-                    alt: `Preview image for ${plugin.name}`,
-                },
-            ],
-        },
-        twitter: {
-            card: 'summary_large_image',
-            images: ['/icon.png'],
         },
     };
 }
@@ -116,6 +85,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                                     </h2>
                                 </div>
                             </div>
+                            {}
                         </div>
                         <p className='text-muted-foreground text-sm'>{appConfigContents.description}</p>
                     </div>
