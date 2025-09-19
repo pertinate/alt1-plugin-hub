@@ -85,7 +85,6 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                                     </h2>
                                 </div>
                             </div>
-                            {}
                         </div>
                         <p className='text-muted-foreground text-sm'>{appConfigContents.description}</p>
                     </div>

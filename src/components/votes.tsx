@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { api } from '~/trpc/react';
 import Link from 'next/link';
 import { Loading } from './loading';
+import { useSession } from 'next-auth/react';
 
 type Props = {
     id: number;
@@ -15,6 +16,7 @@ type Props = {
 };
 
 export const Votes = ({ id, up, down, userVote }: Props) => {
+    const session = useSession();
     const utils = api.useUtils();
     const vote = api.votes.manage.useMutation({
         onSuccess: () => {
@@ -33,7 +35,7 @@ export const Votes = ({ id, up, down, userVote }: Props) => {
                 >
                     <div className='relative flex flex-col items-center'>
                         <button
-                            disabled={vote.isPending}
+                            disabled={vote.isPending || session.status != 'authenticated'}
                             onClick={() => {
                                 if (userVote !== 1) {
                                     vote.mutate({
@@ -58,7 +60,7 @@ export const Votes = ({ id, up, down, userVote }: Props) => {
 
                     <div className='relative flex flex-col items-center'>
                         <button
-                            disabled={vote.isPending}
+                            disabled={vote.isPending || session.status != 'authenticated'}
                             onClick={() => {
                                 if (userVote !== -1) {
                                     vote.mutate({

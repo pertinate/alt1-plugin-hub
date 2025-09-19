@@ -1,6 +1,6 @@
 import { protectedProcedure } from '../trpc';
 import { pluginMetadata, plugins } from '~/server/db/schema';
-import { MetadataSchema, pluginSchema, updatePluginSchema } from './pluginTypes';
+import { isMarkdownUrl, MetadataSchema, pluginSchema, updatePluginSchema } from './pluginTypes';
 import { and, eq, sql } from 'drizzle-orm';
 import z from 'zod';
 
@@ -11,6 +11,9 @@ export const updatePlugin = protectedProcedure
         })
     )
     .mutation(async ({ ctx, input }) => {
+        if (!(await isMarkdownUrl(input.readMe))) {
+            throw new Error('ReadMe needs to be Markdown');
+        }
         return await ctx.db.transaction(async tx => {
             const [plugin] = await tx
                 .update(plugins)

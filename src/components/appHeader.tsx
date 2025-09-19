@@ -4,9 +4,10 @@ import { Button } from './ui/button';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from './ui/dropdown-menu';
 import Link from 'next/link';
 import { auth } from '~/server/auth';
+import { SignOutBtn } from './signOutBtn';
 
 export const AppHeader = async () => {
-    await auth();
+    const session = await auth();
     return (
         <div className='flex items-center justify-between px-2 pt-2'>
             <h1 className='scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance'>Plugin Hub</h1>
@@ -32,6 +33,7 @@ export const AppHeader = async () => {
                     </DropdownMenuContent>
                 </DropdownMenu>
                 <ThemeToggle />
+                {session && <SignOutBtn />}
             </div>
         </div>
     );

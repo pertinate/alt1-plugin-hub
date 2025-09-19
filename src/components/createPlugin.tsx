@@ -16,7 +16,13 @@ import {
 } from './ui/dialog';
 import { Input } from './ui/input';
 import z from 'zod';
-import { MetadataSchema, PluginCategory, pluginSchema } from '~/server/api/dataGroups/pluginTypes';
+import {
+    isMarkdownUrl,
+    isValidJsonUrl,
+    MetadataSchema,
+    PluginCategory,
+    pluginSchema,
+} from '~/server/api/dataGroups/pluginTypes';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import {
     MultiSelect,
@@ -52,6 +58,7 @@ export function CreatePlugin() {
         reset,
         control,
         setValue,
+        setError,
         watch,
         formState: { errors },
     } = useForm({
@@ -99,6 +106,21 @@ export function CreatePlugin() {
                 <form
                     className='space-y-4'
                     onSubmit={handleSubmit(async values => {
+                        if (!(await isValidJsonUrl(values.appConfig))) {
+                            setError('appConfig', {
+                                type: 'validate',
+                                message: 'URL does not return valid JSON',
+                            });
+                            // optionally show a toast
+                            toast.error('AppConfig URL must return valid JSON');
+                            return; // prevent mutation
+                        }
+
+                        if (!(await isMarkdownUrl(values.readMe))) {
+                            toast.error('ReadMe needs to be Markdown');
+                            return;
+                        }
+
                         await mutation.mutateAsync(values);
                     })}
                 >

@@ -90,3 +90,30 @@ export const updatePluginSchema = pluginSchema.extend({
     id: z.number(),
     category: z.array(PluginCategory),
 });
+
+export async function isMarkdownUrl(url: string) {
+    try {
+        const res = await fetch(url);
+        if (!res.ok) return false;
+
+        // Option A: check Content-Type
+        const type = res.headers.get('content-type') ?? '';
+        console.log(type);
+        if (type.includes('text/markdown') || type.includes('text/plain')) return true;
+
+        return false;
+    } catch {
+        return false;
+    }
+}
+
+export async function isValidJsonUrl(url: string) {
+    try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        await res.json(); // throws if not valid JSON
+        return true;
+    } catch {
+        return false; // prevent mutation
+    }
+}

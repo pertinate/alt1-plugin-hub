@@ -8,6 +8,7 @@ import { ThemeProvider } from '~/components/theme-provider';
 import { AppHeader } from '~/components/appHeader';
 import { FABDonate } from '~/components/fabDonate';
 import { Toaster } from '~/components/ui/sonner';
+import { SessionProvider } from 'next-auth/react';
 
 export const metadata: Metadata = {
     title: 'PluginHub',
@@ -25,10 +26,12 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <html lang='en' className={`${geist.variable}`} suppressHydrationWarning>
             <body className='flex min-h-screen flex-col'>
                 <TRPCReactProvider>
-                    <ThemeProvider attribute={'class'} defaultTheme='system' enableSystem>
-                        <AppHeader />
-                        {children}
-                    </ThemeProvider>
+                    <SessionProvider>
+                        <ThemeProvider attribute={'class'} defaultTheme='system' enableSystem>
+                            <AppHeader />
+                            {children}
+                        </ThemeProvider>
+                    </SessionProvider>
                 </TRPCReactProvider>
                 <div id={'portal'} />
                 <FABDonate />
