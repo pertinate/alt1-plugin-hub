@@ -18,20 +18,46 @@ type Props = {
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-export async function generateMetadata({ params, searchParams }: Props, parent: ResolvingMetadata): Promise<Metadata> {
+import type { Metadata, ResolvingMetadata } from 'next';
+import { getPlugin, getAppconfig } from '~/wherever/your/api';
+
+type Props = {
+    params: Promise<{ id: string }>;
+    searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export async function generateMetadata({ params }: Props, parent: ResolvingMetadata): Promise<Metadata> {
     const id = Number((await params).id);
 
     const plugins = await getPlugin(id);
-
     const plugin = plugins[0];
+
+    // shared icons (favicon & apple touch icon)
+    const icons = [
+        { rel: 'icon', url: '/icon.png' },
+        { rel: 'apple-touch-icon', url: '/icon.png' },
+    ];
 
     if (!plugin) {
         return {
             title: 'PluginHub - Plugin does not exist',
             description: 'Plugin does not exist',
+            icons,
             openGraph: {
                 title: 'PluginHub - Plugin does not exist',
                 description: 'Plugin does not exist',
+                images: [
+                    {
+                        url: '/icon.png', // static fallback OG image
+                        width: 1200,
+                        height: 630,
+                        alt: 'PluginHub preview image',
+                    },
+                ],
+            },
+            twitter: {
+                card: 'summary_large_image',
+                images: ['/icon.png'],
             },
         };
     }
@@ -41,9 +67,22 @@ export async function generateMetadata({ params, searchParams }: Props, parent: 
     return {
         title: `PluginHub - ${plugin.name}`,
         description: appConfigContents.description,
+        icons,
         openGraph: {
             title: `PluginHub - ${plugin.name}`,
             description: appConfigContents.description,
+            images: [
+                {
+                    url: '/icon.png', // or generate a plugin-specific image if you have one
+                    width: 1200,
+                    height: 630,
+                    alt: `Preview image for ${plugin.name}`,
+                },
+            ],
+        },
+        twitter: {
+            card: 'summary_large_image',
+            images: ['/icon.png'],
         },
     };
 }
