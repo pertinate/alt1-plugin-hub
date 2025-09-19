@@ -5,12 +5,17 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import Link from 'next/link';
 import { auth } from '~/server/auth';
 import { SignOutBtn } from './signOutBtn';
+import AddToAlt1 from './addToAlt1';
 
 export const AppHeader = async () => {
     const session = await auth();
     return (
         <div className='flex items-center justify-between px-2 pt-2'>
-            <h1 className='scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance'>Plugin Hub</h1>
+            <Link href='/'>
+                <h1 className='scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance'>
+                    Plugin Hub
+                </h1>
+            </Link>
 
             <div className='flex gap-2'>
                 <Button variant={'outline'} asChild>
@@ -23,7 +28,7 @@ export const AppHeader = async () => {
                     <DropdownMenuContent>
                         <DropdownMenuItem>Discord</DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                            <Link href={addPluginHubLink()}>Add to Alt1</Link>
+                            <AddToAlt1 />
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                             <Link href={'http://localhost:3000'} target='_blank' rel='noopener noreferrer'>

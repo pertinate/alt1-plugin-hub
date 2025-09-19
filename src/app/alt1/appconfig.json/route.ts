@@ -3,7 +3,7 @@ import { getBaseUrl } from '~/util/baseUrl';
 export async function GET() {
     return Response.json({
         appName: 'Plugin Hub',
-        description: 'Alt1 React starter kit',
+        description: 'Alt1 Plugin Hub',
         appUrl: '/',
         configUrl: '/alt1/appconfig.json',
         iconUrl: '/icon.png',
@@ -15,7 +15,7 @@ export async function GET() {
         maxHeight: 500,
         requestHandlers: [],
         activators: [],
-        // permissions: '',
+        permissions: 'overlay',
     });
 }
 //alt1://addapp/http://localhost:3000/alt1/appconfig.json
