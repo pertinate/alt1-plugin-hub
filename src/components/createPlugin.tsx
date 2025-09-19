@@ -117,6 +117,10 @@ export function CreatePlugin() {
                         }
 
                         if (!(await isMarkdownUrl(values.readMe))) {
+                            setError('readMe', {
+                                type: 'validate',
+                                message: 'URL does not return valid Markdown',
+                            });
                             toast.error('ReadMe needs to be Markdown');
                             return;
                         }
