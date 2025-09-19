@@ -15,14 +15,6 @@ import { getAppconfig, getPlugin, getReadme } from '~/lib/data';
 
 type Props = {
     params: Promise<{ id: string }>;
-    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-};
-
-import type { Metadata, ResolvingMetadata } from 'next';
-import { getPlugin, getAppconfig } from '~/wherever/your/api';
-
-type Props = {
-    params: Promise<{ id: string }>;
     searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
