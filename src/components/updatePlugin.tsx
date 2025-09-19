@@ -30,6 +30,7 @@ import {
 import { EditIcon, PlusIcon } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '~/lib/utils';
+import { toast } from 'sonner';
 
 const categories = Object.values(PluginCategory.options); // your RS3Skills + OtherCategories union
 const updateWithoutId = updatePluginSchema.omit({ id: true });
@@ -40,6 +41,10 @@ function UpdatePluginForm({ plugin }: { plugin: RouterOutputs['plugin']['getPlug
         onSuccess: () => {
             utils.plugin.invalidate(); // refetch list if you have one
             utils.plugin.getCreatedPlugins.refetch();
+            utils.plugin.getPlugin.refetch();
+            toast(plugin.name, {
+                description: 'Plugin updated.',
+            });
         },
     });
 
@@ -74,15 +79,8 @@ function UpdatePluginForm({ plugin }: { plugin: RouterOutputs['plugin']['getPlug
     return (
         <DialogContent>
             <DialogHeader>
-                <DialogTitle className='flex gap-4'>
-                    <>New Plugin</>
-                    {mutation.isSuccess && (
-                        <Badge variant='secondary' className='bg-green-500 text-white hover:bg-green-600'>
-                            Success
-                        </Badge>
-                    )}
-                </DialogTitle>
-                <DialogDescription>Fill out the form to create a new plugin.</DialogDescription>
+                <DialogTitle className='flex gap-4'>Update Plugin</DialogTitle>
+                <DialogDescription>Fill out the form to update this plugin.</DialogDescription>
             </DialogHeader>
             <form
                 className='space-y-4'

@@ -7,6 +7,7 @@ import { TRPCReactProvider } from '~/trpc/react';
 import { ThemeProvider } from '~/components/theme-provider';
 import { AppHeader } from '~/components/appHeader';
 import { FABDonate } from '~/components/fabDonate';
+import { Toaster } from '~/components/ui/sonner';
 
 export const metadata: Metadata = {
     title: 'PluginHub',
@@ -31,6 +32,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
                 </TRPCReactProvider>
                 <div id={'portal'} />
                 <FABDonate />
+                <Toaster />
             </body>
         </html>
     );

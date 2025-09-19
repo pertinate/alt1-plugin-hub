@@ -28,6 +28,7 @@ import {
 } from './ui/multi-select';
 import { PlusIcon } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 const categories = Object.values(PluginCategory.options); // your RS3Skills + OtherCategories union
 
@@ -35,9 +36,13 @@ export function CreatePlugin() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const utils = api.useUtils();
     const mutation = api.plugin.createPlugin.useMutation({
-        onSuccess: () => {
+        onSuccess: (data, variables) => {
             utils.plugin.invalidate();
             setIsModalOpen(false);
+            console.log(data, variables);
+            toast(variables.name, {
+                description: 'Plugin created.',
+            });
         },
     });
 
