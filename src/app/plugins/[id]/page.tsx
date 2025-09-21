@@ -12,6 +12,7 @@ import MDRender from '~/components/MDRender';
 import { cache } from 'react';
 import type { Metadata, ResolvingMetadata } from 'next';
 import { getAppconfig, getPlugin, getReadme, isUrl } from '~/lib/data';
+import { Votes } from '~/components/votes';
 
 type Props = {
     params: Promise<{ id: string }>;
@@ -93,7 +94,6 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                                     </h2>
                                 </div>
                             </div>
-                            {}
                         </div>
                         <p className='text-muted-foreground text-sm'>{appConfigContents.description}</p>
                     </div>
@@ -111,6 +111,9 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                                         Install
                                     </Link>
                                 </Button>
+                                <div className='flex items-center justify-center'>
+                                    <Votes id={plugin.id} />
+                                </div>
                             </div>
                         </CardContent>
                     </Card>

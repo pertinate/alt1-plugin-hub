@@ -10,13 +10,9 @@ import { cn } from '~/lib/utils';
 
 type Props = {
     id: number;
-    up?: number;
-    down?: number;
-    userVote: number;
-    appConfig: string;
 };
 
-export const Votes = ({ id, up, down, userVote }: Props) => {
+export const Votes = ({ id }: Props) => {
     const session = useSession();
     const utils = api.useUtils();
     const vote = api.votes.manage.useMutation({
@@ -28,7 +24,7 @@ export const Votes = ({ id, up, down, userVote }: Props) => {
 
     const votes = api.votes.getVotes.useQuery(id);
     return (
-        <div className='flex w-full justify-between gap-2'>
+        <div className='flex justify-between gap-2'>
             <Loading loading={votes.isPending || vote.isPending}>
                 <div
                     // onValueChange={setValue}
@@ -38,7 +34,7 @@ export const Votes = ({ id, up, down, userVote }: Props) => {
                         <button
                             disabled={vote.isPending || session.status != 'authenticated'}
                             onClick={() => {
-                                if (userVote !== 1) {
+                                if (votes.data?.userVote !== 1) {
                                     vote.mutate({
                                         id,
                                         value: 1,
@@ -52,7 +48,7 @@ export const Votes = ({ id, up, down, userVote }: Props) => {
                             }}
                             className={cn(
                                 'rounded-full p-2 transition-colors',
-                                userVote === 1 ? 'bg-green-500 text-white' : 'hover:bg-muted',
+                                votes.data?.userVote === 1 ? 'bg-green-500 text-white' : 'hover:bg-muted',
                                 session.status !== 'authenticated' && 'pointer-events-none'
                             )}
                         >
@@ -65,7 +61,7 @@ export const Votes = ({ id, up, down, userVote }: Props) => {
                         <button
                             disabled={vote.isPending || session.status != 'authenticated'}
                             onClick={() => {
-                                if (userVote !== -1) {
+                                if (votes.data?.userVote !== -1) {
                                     vote.mutate({
                                         id,
                                         value: -1,
@@ -79,7 +75,7 @@ export const Votes = ({ id, up, down, userVote }: Props) => {
                             }}
                             className={cn(
                                 'rounded-full p-2 transition-colors',
-                                userVote === -1 ? 'bg-red-500 text-white' : 'hover:bg-muted',
+                                votes.data?.userVote === -1 ? 'bg-red-500 text-white' : 'hover:bg-muted',
                                 session.status !== 'authenticated' && 'pointer-events-none'
                             )}
                         >
