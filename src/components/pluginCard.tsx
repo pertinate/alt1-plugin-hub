@@ -26,13 +26,7 @@ export const PluginCard = ({ data, appConfig }: Props) => {
             </CardHeader>
             <CardFooter>
                 <div className='flex w-full justify-between gap-2'>
-                    <Votes
-                        id={data?.pluginId ?? -1}
-                        up={data?.upvotes}
-                        down={data?.downvotes}
-                        userVote={data?.userVote ?? 0}
-                        appConfig={data?.appConfig ?? ''}
-                    />
+                    <Votes id={data?.pluginId ?? -1} />
 
                     <Button asChild>
                         <Link href={`alt1://addapp/${data?.appConfig}`}>Install</Link>
