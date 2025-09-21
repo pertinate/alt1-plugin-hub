@@ -127,6 +127,10 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                                     <Label className='text-md font-extrabold'>Author</Label>
                                     <Label className='text-xlg font-extralight'>{plugin.createByUser}</Label>
                                 </div>
+                                <div className='flex flex-col gap-2'>
+                                    <Label className='text-md font-extrabold'>Categories</Label>
+                                    <Label className='text-xlg font-extralight'>{plugin.category?.join(', ')}</Label>
+                                </div>
                                 {plugin.metadata
                                     .filter(entry => entry.type == 'Info')
                                     .map(entry => (

@@ -82,7 +82,7 @@ export const pluginSchema = z.object({
     appConfig: z.string().url().url({ message: 'Must be a valid URL' }),
     readMe: z.string().url().url({ message: 'Must be a valid URL' }),
     metadata: z.array(MetadataSchema).max(15).min(0),
-    category: z.array(PluginCategory).max(10).min(0),
+    category: z.array(PluginCategory).max(30).min(0),
     status: z.union([z.literal('In Development'), z.literal('Published')]),
 });
 

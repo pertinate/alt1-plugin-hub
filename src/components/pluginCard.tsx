@@ -25,7 +25,7 @@ export const PluginCard = ({ data, appConfig }: Props) => {
                 </CardAction>
             </CardHeader>
             <CardFooter>
-                <div className='flex w-full justify-between gap-2'>
+                <div className='flex w-full items-end justify-between gap-2'>
                     <Votes id={data?.pluginId ?? -1} />
 
                     <Button asChild>

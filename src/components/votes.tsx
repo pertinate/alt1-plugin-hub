@@ -7,6 +7,9 @@ import Link from 'next/link';
 import { Loading } from './loading';
 import { useSession } from 'next-auth/react';
 import { cn } from '~/lib/utils';
+import { Card, CardContent } from './ui/card';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { toast } from 'sonner';
 
 type Props = {
     id: number;
@@ -24,67 +27,72 @@ export const Votes = ({ id }: Props) => {
 
     const votes = api.votes.getVotes.useQuery(id);
     return (
-        <div className='flex justify-between gap-2'>
+        <Card className='overflow-hidden p-0'>
             <Loading loading={votes.isPending || vote.isPending}>
-                <div
-                    // onValueChange={setValue}
-                    className='flex items-center space-x-6'
-                >
-                    <div className='relative flex flex-col items-center'>
-                        <button
-                            disabled={vote.isPending || session.status != 'authenticated'}
-                            onClick={() => {
-                                if (votes.data?.userVote !== 1) {
-                                    vote.mutate({
-                                        id,
-                                        value: 1,
-                                    });
-                                } else {
-                                    vote.mutate({
-                                        id,
-                                        value: 0,
-                                    });
-                                }
-                            }}
-                            className={cn(
-                                'rounded-full p-2 transition-colors',
-                                votes.data?.userVote === 1 ? 'bg-green-500 text-white' : 'hover:bg-muted',
-                                session.status !== 'authenticated' && 'pointer-events-none'
-                            )}
-                        >
-                            <ThumbsUp className='h-5 w-5' />
-                        </button>
-                        <span className='absolute -bottom-5 text-sm font-medium'>{votes.data?.upvotes}</span>
-                    </div>
+                <CardContent className='p-2'>
+                    <div className='flex items-center space-x-6'>
+                        <div className='relative flex flex-col items-center'>
+                            <button
+                                disabled={vote.isPending}
+                                onClick={() => {
+                                    if (session.status !== 'authenticated') {
+                                        toast('Please log in to vote for a plugin.');
+                                        return;
+                                    }
+                                    if (votes.data?.userVote !== 1) {
+                                        vote.mutate({
+                                            id,
+                                            value: 1,
+                                        });
+                                    } else {
+                                        vote.mutate({
+                                            id,
+                                            value: 0,
+                                        });
+                                    }
+                                }}
+                                className={cn(
+                                    'rounded-full p-2 transition-colors',
+                                    votes.data?.userVote === 1 ? 'text-green-500' : 'hover:bg-muted'
+                                )}
+                            >
+                                <ThumbsUp className='h-5 w-5' />
+                            </button>
+                            <span className='text-sm font-medium'>{votes.data?.upvotes}</span>
+                        </div>
 
-                    <div className='relative flex flex-col items-center'>
-                        <button
-                            disabled={vote.isPending || session.status != 'authenticated'}
-                            onClick={() => {
-                                if (votes.data?.userVote !== -1) {
-                                    vote.mutate({
-                                        id,
-                                        value: -1,
-                                    });
-                                } else {
-                                    vote.mutate({
-                                        id,
-                                        value: 0,
-                                    });
-                                }
-                            }}
-                            className={cn(
-                                'rounded-full p-2 transition-colors',
-                                votes.data?.userVote === -1 ? 'bg-red-500 text-white' : 'hover:bg-muted',
-                                session.status !== 'authenticated' && 'pointer-events-none'
-                            )}
-                        >
-                            <ThumbsDown className='h-5 w-5' />
-                        </button>
-                        <span className='absolute -bottom-5 text-sm font-medium'>{votes.data?.downvotes}</span>
+                        <div className='relative flex flex-col items-center'>
+                            <button
+                                disabled={vote.isPending}
+                                onClick={() => {
+                                    if (session.status !== 'authenticated') {
+                                        toast('Please log in to vote for a plugin. Click "My Repos" to log in.');
+                                        return;
+                                    }
+                                    if (votes.data?.userVote !== -1) {
+                                        vote.mutate({
+                                            id,
+                                            value: -1,
+                                        });
+                                    } else {
+                                        vote.mutate({
+                                            id,
+                                            value: 0,
+                                        });
+                                    }
+                                }}
+                                className={cn(
+                                    'rounded-full p-2 transition-colors',
+                                    votes.data?.userVote === -1 ? 'text-red-500' : 'hover:bg-muted'
+                                )}
+                            >
+                                <ThumbsDown className='h-5 w-5' />
+                            </button>
+                            <span className='text-sm font-medium'>{votes.data?.downvotes}</span>
+                        </div>
                     </div>
-                </div>
+                </CardContent>
             </Loading>
-        </div>
+        </Card>
     );
 };
