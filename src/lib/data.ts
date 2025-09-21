@@ -13,3 +13,12 @@ export const getAppconfig = cache(async (url: string) => {
 export const getPlugin = cache(async (id: number) => {
     return await api.plugin.getPlugin(id);
 });
+
+export function isUrl(path: string): boolean {
+    try {
+        const url = new URL(path);
+        return url.protocol === 'http:' || url.protocol === 'https:';
+    } catch {
+        return false; // Not a valid URL
+    }
+}

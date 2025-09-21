@@ -11,7 +11,7 @@ import { Label } from '~/components/ui/label';
 import MDRender from '~/components/MDRender';
 import { cache } from 'react';
 import type { Metadata, ResolvingMetadata } from 'next';
-import { getAppconfig, getPlugin, getReadme } from '~/lib/data';
+import { getAppconfig, getPlugin, getReadme, isUrl } from '~/lib/data';
 
 type Props = {
     params: Promise<{ id: string }>;
@@ -79,7 +79,15 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                                     </Link>
                                 </Button>
                                 <div className='flex flex-row gap-4'>
-                                    <img className='h-10' src={appConfigContents.iconUrl} alt='Plugin Icon' />
+                                    <img
+                                        className='h-10'
+                                        src={
+                                            isUrl(appConfigContents.iconUrl)
+                                                ? appConfigContents.iconUrl
+                                                : new URL(appConfigContents.iconUrl, plugin.appConfig!).toString()
+                                        }
+                                        alt='Plugin Icon'
+                                    />
                                     <h2 className='scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0'>
                                         {plugin.name}
                                     </h2>
