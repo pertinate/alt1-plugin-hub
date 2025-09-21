@@ -1,6 +1,6 @@
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import { Button } from './ui/button';
-import { Card, CardHeader, CardTitle, CardDescription, CardAction, CardFooter } from './ui/card';
+import { Card, CardHeader, CardTitle, CardDescription, CardAction, CardFooter, CardContent } from './ui/card';
 import { Votes } from './votes';
 import type { RouterOutputs } from '~/trpc/react';
 import type { Alt1Config } from '~/lib/alt1';
@@ -24,13 +24,16 @@ export const PluginCard = ({ data, appConfig }: Props) => {
                     </Button>
                 </CardAction>
             </CardHeader>
-            <CardFooter>
-                <div className='flex w-full items-end justify-between gap-2'>
-                    <Votes id={data?.pluginId ?? -1} />
+            <CardFooter className='h-full'>
+                <div className='flex h-full w-full flex-col'>
+                    <div className='shrink-0 grow' />
+                    <div className='flex shrink items-end justify-between gap-2'>
+                        <Votes id={data?.pluginId ?? -1} />
 
-                    <Button asChild>
-                        <Link href={`alt1://addapp/${data?.appConfig}`}>Install</Link>
-                    </Button>
+                        <Button asChild>
+                            <Link href={`alt1://addapp/${data?.appConfig}`}>Install</Link>
+                        </Button>
+                    </div>
                 </div>
             </CardFooter>
         </Card>
