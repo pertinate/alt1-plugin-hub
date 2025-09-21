@@ -35,7 +35,7 @@ export const AppHeader = async () => {
                         <DropdownMenuItem>
                             <AddToAlt1 />
                         </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
+                        <DropdownMenuItem>
                             <OpenInBrowser />
                         </DropdownMenuItem>
                     </DropdownMenuContent>
