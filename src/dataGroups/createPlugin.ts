@@ -1,4 +1,4 @@
-import { protectedProcedure } from '../trpc';
+import { protectedProcedure } from '../server/api/trpc';
 import { pluginMetadata, plugins } from '~/server/db/schema';
 import { isMarkdownUrl, isValidJsonUrl, pluginSchema } from './pluginTypes';
 

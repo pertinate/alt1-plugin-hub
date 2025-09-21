@@ -56,7 +56,7 @@ const OtherCategories = [
     'Developer / Debug',
 ] as const;
 
-const allCategories = [...RS3Skills, ...OtherCategories] as const;
+export const allCategories = [...RS3Skills, ...OtherCategories] as const;
 
 // Full union ,
 export const PluginCategory = z.enum(allCategories);

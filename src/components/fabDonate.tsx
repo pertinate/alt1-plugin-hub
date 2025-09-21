@@ -11,7 +11,7 @@ export function FABDonate() {
             aria-label='Donate'
             asChild
         >
-            <Link href='https://buymeacoffee.com/pertinate' target='_blank'>
+            <Link href='https://buymeacoffee.com/pertinate' target='_blank' rel='noopener noreferrer'>
                 <Heart className='h-7 w-7' />
             </Link>
         </Button>

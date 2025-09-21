@@ -6,6 +6,7 @@ import { api } from '~/trpc/react';
 import Link from 'next/link';
 import { Loading } from './loading';
 import { useSession } from 'next-auth/react';
+import { cn } from '~/lib/utils';
 
 type Props = {
     id: number;
@@ -49,9 +50,11 @@ export const Votes = ({ id, up, down, userVote }: Props) => {
                                     });
                                 }
                             }}
-                            className={`rounded-full p-2 transition-colors ${
-                                userVote === 1 ? 'bg-green-500 text-white' : 'hover:bg-muted'
-                            }`}
+                            className={cn(
+                                'rounded-full p-2 transition-colors',
+                                userVote === 1 ? 'bg-green-500 text-white' : 'hover:bg-muted',
+                                session.status !== 'authenticated' && 'pointer-events-none'
+                            )}
                         >
                             <ThumbsUp className='h-5 w-5' />
                         </button>
@@ -74,9 +77,11 @@ export const Votes = ({ id, up, down, userVote }: Props) => {
                                     });
                                 }
                             }}
-                            className={`rounded-full p-2 transition-colors ${
-                                userVote === -1 ? 'bg-red-500 text-white' : 'hover:bg-muted'
-                            }`}
+                            className={cn(
+                                'rounded-full p-2 transition-colors',
+                                userVote === -1 ? 'bg-red-500 text-white' : 'hover:bg-muted',
+                                session.status !== 'authenticated' && 'pointer-events-none'
+                            )}
                         >
                             <ThumbsDown className='h-5 w-5' />
                         </button>

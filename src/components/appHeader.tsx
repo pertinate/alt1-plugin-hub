@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { auth } from '~/server/auth';
 import { SignOutBtn } from './signOutBtn';
 import AddToAlt1 from './addToAlt1';
+import OpenInBrowser from './openInBrowser';
 
 export const AppHeader = async () => {
     const session = await auth();
@@ -26,14 +27,16 @@ export const AppHeader = async () => {
                         <Button variant={'outline'}>Help</Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                        <DropdownMenuItem>Discord</DropdownMenuItem>
                         <DropdownMenuItem asChild>
+                            <Link href={'http://localhost:3000'} target='_blank' rel='noopener noreferrer'>
+                                Discord
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
                             <AddToAlt1 />
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                            <Link href={'http://localhost:3000'} target='_blank' rel='noopener noreferrer'>
-                                Open in Browser
-                            </Link>
+                            <OpenInBrowser />
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

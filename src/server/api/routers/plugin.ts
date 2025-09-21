@@ -4,11 +4,11 @@ import { z } from 'zod';
 import type { Alt1Config } from '~/lib/alt1';
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '~/server/api/trpc';
-import { createPlugin } from '../dataGroups/createPlugin';
+import { createPlugin } from '../../../dataGroups/createPlugin';
 import { pluginMetadata, plugins, users, votes } from '~/server/db/schema';
 import { and, desc, eq, lt, sql } from 'drizzle-orm';
 import { fetchAlt1Config } from '~/util/fetchAlt1Config';
-import { updatePlugin } from '../dataGroups/updatePlugin';
+import { updatePlugin } from '../../../dataGroups/updatePlugin';
 import { metadata } from '~/app/layout';
 
 export const pluginRouter = createTRPCRouter({
@@ -99,6 +99,7 @@ export const pluginRouter = createTRPCRouter({
                               number | null
                           >`MAX(CASE WHEN ${votes.createdById} = ${ctx.session.user.id} THEN ${votes.value} ELSE NULL END)`
                         : sql<number | null>`NULL`,
+                    categories: plugins.category,
                 })
                 .from(plugins)
                 .leftJoin(votes, eq(votes.pluginId, plugins.id))
