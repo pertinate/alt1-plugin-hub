@@ -25,7 +25,7 @@ export const createPlugin = protectedProcedure.input(pluginSchema).mutation(asyn
             })
             .returning();
 
-        if (newPlugin) {
+        if (newPlugin && input.metadata.length > 0) {
             await tx.insert(pluginMetadata).values(
                 input.metadata.map(entry => ({
                     ...entry,

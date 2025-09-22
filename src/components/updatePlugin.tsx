@@ -95,25 +95,6 @@ function UpdatePluginForm({ plugin }: { plugin: RouterOutputs['plugin']['getPlug
             <form
                 className='space-y-4'
                 onSubmit={handleSubmit(async values => {
-                    // if (!(await isValidJsonUrl(values.appConfig))) {
-                    //     setError('appConfig', {
-                    //         type: 'validate',
-                    //         message: 'URL does not return valid JSON',
-                    //     });
-                    //     // optionally show a toast
-                    //     toast.error('AppConfig URL must return valid JSON');
-                    //     return; // prevent mutation
-                    // }
-
-                    // if (!(await isMarkdownUrl(values.readMe))) {
-                    //     setError('readMe', {
-                    //         type: 'validate',
-                    //         message: 'URL does not return valid Markdown',
-                    //     });
-                    //     toast.error('ReadMe needs to be Markdown');
-                    //     return;
-                    // }
-
                     await mutation.mutateAsync({
                         ...values,
                         id: plugin.id,

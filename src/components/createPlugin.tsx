@@ -20,8 +20,6 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Badge } from './ui/badge';
 import { cn } from '~/lib/utils';
 
-const categories = Object.values(PluginCategory.options); // your RS3Skills + OtherCategories union
-
 export function CreatePlugin() {
     const [open, setOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -30,7 +28,9 @@ export function CreatePlugin() {
         onSuccess: (data, variables) => {
             utils.plugin.invalidate();
             setIsModalOpen(false);
-            console.log(data, variables);
+
+            reset();
+
             toast(variables.name, {
                 description: 'Plugin created.',
             });
@@ -41,6 +41,8 @@ export function CreatePlugin() {
             toast('There was an issue creating your plugin', { description: error.message });
         },
     });
+
+    console.log(pluginSchema.shape.metadata._def);
 
     const {
         register,
@@ -96,25 +98,6 @@ export function CreatePlugin() {
                 <form
                     className='space-y-4'
                     onSubmit={handleSubmit(async values => {
-                        // if (!(await isValidJsonUrl(values.appConfig))) {
-                        //     setError('appConfig', {
-                        //         type: 'validate',
-                        //         message: 'URL does not return valid JSON',
-                        //     });
-                        //     // optionally show a toast
-                        //     toast.error('AppConfig URL must return valid JSON');
-                        //     return; // prevent mutation
-                        // }
-
-                        // if (!(await isMarkdownUrl(values.readMe))) {
-                        //     setError('readMe', {
-                        //         type: 'validate',
-                        //         message: 'URL does not return valid Markdown',
-                        //     });
-                        //     toast.error('ReadMe needs to be Markdown');
-                        //     return;
-                        // }
-
                         await mutation.mutateAsync(values);
                     })}
                 >
