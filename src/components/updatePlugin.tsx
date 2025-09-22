@@ -51,7 +51,9 @@ function UpdatePluginForm({ plugin }: { plugin: RouterOutputs['plugin']['getPlug
             });
         },
         onError(error, variables, context) {
-            console.error(error, variables, context);
+            console.error(error, variables);
+
+            toast('There was an issue updating your plugin', { description: error.message });
         },
     });
 

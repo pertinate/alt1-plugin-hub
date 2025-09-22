@@ -36,7 +36,9 @@ export function CreatePlugin() {
             });
         },
         onError(error, variables, context) {
-            console.error(error, variables, context);
+            console.error(error, variables);
+
+            toast('There was an issue creating your plugin', { description: error.message });
         },
     });
 

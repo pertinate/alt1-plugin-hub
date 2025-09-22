@@ -3,6 +3,7 @@ import { pluginMetadata, plugins } from '~/server/db/schema';
 import { isMarkdownUrl, isValidJsonUrl, MetadataSchema, pluginSchema, updatePluginSchema } from './pluginTypes';
 import { and, eq, sql } from 'drizzle-orm';
 import z from 'zod';
+import { TRPCError } from '@trpc/server';
 
 export const updatePlugin = protectedProcedure
     .input(
@@ -12,11 +13,11 @@ export const updatePlugin = protectedProcedure
     )
     .mutation(async ({ ctx, input }) => {
         if (!(await isMarkdownUrl(input.readMe))) {
-            throw new Error('ReadMe needs to be Markdown');
+            throw new TRPCError({ code: 'BAD_REQUEST', message: 'ReadMe needs to be Markdown' });
         }
 
         if (!(await isValidJsonUrl(input.appConfig))) {
-            throw new Error('AppConfig needs to be JSON');
+            throw new TRPCError({ code: 'BAD_REQUEST', message: 'AppConfig needs to be JSON' });
         }
 
         return await ctx.db.transaction(async tx => {

@@ -1,14 +1,15 @@
 import { protectedProcedure } from '../server/api/trpc';
 import { pluginMetadata, plugins } from '~/server/db/schema';
 import { isMarkdownUrl, isValidJsonUrl, pluginSchema } from './pluginTypes';
+import { TRPCError } from '@trpc/server';
 
 export const createPlugin = protectedProcedure.input(pluginSchema).mutation(async ({ ctx, input }) => {
     if (!(await isMarkdownUrl(input.readMe))) {
-        throw new Error('ReadMe needs to be Markdown');
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'ReadMe needs to be Markdown' });
     }
 
     if (!(await isValidJsonUrl(input.appConfig))) {
-        throw new Error('AppConfig needs to be JSON');
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'AppConfig needs to be JSON' });
     }
     return await ctx.db.transaction(async tx => {
         const [newPlugin] = await tx
