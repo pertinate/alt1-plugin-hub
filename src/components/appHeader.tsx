@@ -28,7 +28,7 @@ export const AppHeader = async () => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                         <DropdownMenuItem asChild>
-                            <Link href={'http://localhost:3000'} target='_blank' rel='noopener noreferrer'>
+                            <Link href={'https://discord.gg/VKkmzhhj'} target='_blank' rel='noopener noreferrer'>
                                 Discord
                             </Link>
                         </DropdownMenuItem>
