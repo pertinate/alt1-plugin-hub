@@ -1,6 +1,6 @@
 import { protectedProcedure } from '../server/api/trpc';
 import { pluginMetadata, plugins } from '~/server/db/schema';
-import { isMarkdownUrl, MetadataSchema, pluginSchema, updatePluginSchema } from './pluginTypes';
+import { isMarkdownUrl, isValidJsonUrl, MetadataSchema, pluginSchema, updatePluginSchema } from './pluginTypes';
 import { and, eq, sql } from 'drizzle-orm';
 import z from 'zod';
 
@@ -14,6 +14,11 @@ export const updatePlugin = protectedProcedure
         if (!(await isMarkdownUrl(input.readMe))) {
             throw new Error('ReadMe needs to be Markdown');
         }
+
+        if (!(await isValidJsonUrl(input.appConfig))) {
+            throw new Error('AppConfig needs to be JSON');
+        }
+
         return await ctx.db.transaction(async tx => {
             const [plugin] = await tx
                 .update(plugins)

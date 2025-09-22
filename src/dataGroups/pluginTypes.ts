@@ -113,7 +113,8 @@ export async function isValidJsonUrl(url: string) {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         await res.json(); // throws if not valid JSON
         return true;
-    } catch {
+    } catch (error) {
+        console.error(error);
         return false; // prevent mutation
     }
 }
