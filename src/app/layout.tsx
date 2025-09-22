@@ -9,6 +9,7 @@ import { AppHeader } from '~/components/appHeader';
 import { FABDonate } from '~/components/fabDonate';
 import { Toaster } from '~/components/ui/sonner';
 import { SessionProvider } from 'next-auth/react';
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata: Metadata = {
     title: 'PluginHub',
@@ -40,6 +41,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
                 <div id={'portal'} />
                 <FABDonate />
                 <Toaster />
+                <Analytics />
             </body>
         </html>
     );
