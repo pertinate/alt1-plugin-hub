@@ -220,12 +220,15 @@ function UpdatePluginForm({ plugin }: { plugin: RouterOutputs['plugin']['getPlug
                                                     <SelectValue placeholder='Type' />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value='Support'>Support</SelectItem>
+                                                    <SelectItem value='Support'>Link</SelectItem>
                                                     <SelectItem value='Info'>Info</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                             <Input placeholder='Name' {...register(`metadata.${index}.name`)} />
-                                            <Input placeholder='Value' {...register(`metadata.${index}.value`)} />
+                                            <Input
+                                                placeholder={type == 'Info' ? 'Text' : 'URL'}
+                                                {...register(`metadata.${index}.value`)}
+                                            />
                                             <Button
                                                 type='button'
                                                 variant='destructive'

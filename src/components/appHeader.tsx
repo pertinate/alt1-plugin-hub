@@ -32,6 +32,11 @@ export const AppHeader = async () => {
                                 Discord
                             </Link>
                         </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link href={'https://discord.gg/AKWKmAPg'} target='_blank' rel='noopener noreferrer'>
+                                Alt1 Discord
+                            </Link>
+                        </DropdownMenuItem>
                         <DropdownMenuItem>
                             <AddToAlt1 />
                         </DropdownMenuItem>
