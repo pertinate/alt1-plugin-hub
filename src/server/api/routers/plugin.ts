@@ -6,7 +6,7 @@ import type { Alt1Config } from '~/lib/alt1';
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '~/server/api/trpc';
 import { createPlugin } from '../../../dataGroups/createPlugin';
 import { pluginMetadata, plugins, users, votes } from '~/server/db/schema';
-import { and, desc, eq, lt, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, ilike, lt, or, sql } from 'drizzle-orm';
 import { fetchAlt1Config } from '~/util/fetchAlt1Config';
 import { updatePlugin } from '../../../dataGroups/updatePlugin';
 import { metadata } from '~/app/layout';
@@ -80,11 +80,44 @@ export const pluginRouter = createTRPCRouter({
         .input(
             z.object({
                 limit: z.number().min(1).max(100).default(12),
-                cursor: z.number().nullish(),
+                cursor: z
+                    .object({
+                        total: z.number(),
+                        pluginId: z.number(),
+                    })
+                    .nullish(),
+                search: z.string(),
+                categories: z.array(z.string()),
             })
         )
         .query(async ({ ctx, input }) => {
-            const { limit, cursor } = input;
+            const { limit, cursor, search, categories } = input;
+
+            const conditions = [];
+
+            if (cursor) {
+                // conditions.push(gt(plugins.id, cursor));
+                conditions.push(
+                    or(
+                        sql`( SUM(${votes.value}) < ${cursor.total} )`,
+                        and(sql`( SUM(${votes.value}) = ${cursor.total} )`, sql`${plugins.id} > ${cursor.pluginId}`)
+                    )
+                );
+            }
+
+            if (search) {
+                conditions.push(ilike(plugins.name, `%${search}%`));
+            }
+
+            if (categories?.length > 0) {
+                console.log(categories, sql`${plugins.category} @> ${categories}::text[]`);
+                conditions.push(
+                    sql`${plugins.category} @> ARRAY[${sql.join(
+                        categories.map(c => sql`${c}`),
+                        sql`, `
+                    )}]::text[]`
+                );
+            }
 
             const pluginsQuery = ctx.db
                 .select({
@@ -102,21 +135,23 @@ export const pluginRouter = createTRPCRouter({
                     categories: plugins.category,
                 })
                 .from(plugins)
+                .where(conditions.length ? and(...conditions) : undefined)
                 .leftJoin(votes, eq(votes.pluginId, plugins.id))
                 .groupBy(plugins.id, plugins.name, plugins.appConfig)
-                .orderBy(desc(plugins.id)) // keep cursor-compatible ordering
+                .orderBy(asc(sql`SUM(${votes.value})`), asc(plugins.id)) // keep cursor-compatible ordering
                 .limit(limit + 1);
-
-            if (cursor) {
-                pluginsQuery.where(lt(plugins.id, cursor));
-            }
 
             const rows = await pluginsQuery;
 
-            let nextCursor: number | null = null;
+            console.log(rows);
+
+            let nextCursor: { total: number; pluginId: number } | null = null;
             if (rows.length > limit) {
-                const nextItem = rows.pop(); // remove extra row
-                nextCursor = nextItem!.pluginId;
+                const last = rows[limit - 1];
+                nextCursor = {
+                    total: last!.total,
+                    pluginId: last!.pluginId,
+                };
             }
 
             // fetch configs in parallel

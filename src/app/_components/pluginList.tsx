@@ -1,7 +1,7 @@
 'use client';
 import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from '~/components/ui/command';
 import { ChevronsUpDownIcon, CheckIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { PluginCard } from '~/components/pluginCard';
 import { Button } from '~/components/ui/button';
 import {
@@ -20,18 +20,9 @@ import { Badge } from '~/components/ui/badge';
 import { Label } from '~/components/ui/label';
 
 export default function PluginList() {
-    const plugins = api.plugin.getPlugins.useInfiniteQuery(
-        { limit: 12 },
-        { getNextPageParam: lastPage => lastPage.nextCursor }
-    );
-    const [open, setOpen] = useState(false);
     const [search, setSearch] = useState('');
-    const [categorySearch, setCategorySearch] = useState('');
-    const [filter, setFilter] = useState('');
+    const [open, setOpen] = useState(false);
 
-    useDebounce(search, value => {
-        setFilter(value);
-    });
     const getInitCategories = () =>
         allCategories.reduce(
             (acc, name) => {
@@ -45,6 +36,20 @@ export default function PluginList() {
 
     const allCategoriesSet = new Set(selectedCategories.map(([name]) => name));
 
+    console.log(allCategoriesSet, Array.from(allCategoriesSet));
+
+    const plugins = api.plugin.getPlugins.useInfiniteQuery(
+        { limit: 12, search, categories: Array.from(allCategoriesSet) },
+        { getNextPageParam: lastPage => lastPage.nextCursor }
+    );
+
+    function toggleCategory(name: string) {
+        setCheckedCategories(prev => ({
+            ...prev,
+            [name]: !prev[name],
+        }));
+    }
+
     const filteredPlugins = plugins.data?.pages
         .map(entry => entry.plugins)
         .flat()
@@ -53,12 +58,27 @@ export default function PluginList() {
         )
         .filter(entry => entry.data.name?.toLowerCase().includes(search.toLowerCase()));
 
-    function toggleCategory(name: string) {
-        setCheckedCategories(prev => ({
-            ...prev,
-            [name]: !prev[name],
-        }));
-    }
+    const loaderRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        if (!loaderRef.current || !plugins.hasNextPage) return;
+
+        const observer = new IntersectionObserver(
+            entries => {
+                const first = entries[0];
+                if (first?.isIntersecting) {
+                    plugins.fetchNextPage();
+                }
+            },
+            { threshold: 1 }
+        );
+
+        const current = loaderRef.current;
+        observer.observe(current);
+        return () => {
+            observer.unobserve(current);
+        };
+    }, [plugins.fetchNextPage, plugins.hasNextPage]);
 
     return (
         <>
@@ -115,29 +135,25 @@ export default function PluginList() {
                                                 Clear
                                             </Button>
                                         </CommandItem>
-                                        {Object.entries(categories)
-                                            .filter(([name]) =>
-                                                name.toLowerCase().includes(categorySearch.toLowerCase())
-                                            )
-                                            .map(([name, value]) => {
-                                                return (
-                                                    <CommandItem
-                                                        key={name}
-                                                        value={name}
-                                                        onSelect={currentValue => {
-                                                            toggleCategory(currentValue);
-                                                        }}
-                                                    >
-                                                        <CheckIcon
-                                                            className={cn(
-                                                                'mr-2 h-4 w-4',
-                                                                value ? 'opacity-100' : 'opacity-0'
-                                                            )}
-                                                        />
-                                                        {name}
-                                                    </CommandItem>
-                                                );
-                                            })}
+                                        {Object.entries(categories).map(([name, value]) => {
+                                            return (
+                                                <CommandItem
+                                                    key={name}
+                                                    value={name}
+                                                    onSelect={currentValue => {
+                                                        toggleCategory(currentValue);
+                                                    }}
+                                                >
+                                                    <CheckIcon
+                                                        className={cn(
+                                                            'mr-2 h-4 w-4',
+                                                            value ? 'opacity-100' : 'opacity-0'
+                                                        )}
+                                                    />
+                                                    {name}
+                                                </CommandItem>
+                                            );
+                                        })}
                                     </CommandGroup>
                                 </CommandList>
                             </Command>
@@ -158,6 +174,11 @@ export default function PluginList() {
                             )
                     )}
             </div>
+            {plugins.hasNextPage && (
+                <div ref={loaderRef} className='w-full text-center' style={{ textAlign: 'center', padding: '1rem' }}>
+                    {plugins.isFetchingNextPage ? 'Loading more…' : 'Scroll to load more'}
+                </div>
+            )}
         </>
     );
 }
