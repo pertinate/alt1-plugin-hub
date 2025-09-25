@@ -36,7 +36,7 @@ export const Votes = ({ id }: Props) => {
                                 disabled={vote.isPending}
                                 onClick={() => {
                                     if (session.status !== 'authenticated') {
-                                        toast('Please log in to vote for a plugin.');
+                                        toast('Please log in to vote for a plugin. Click "My Repos" to log in.');
                                         return;
                                     }
                                     if (votes.data?.userVote !== 1) {
