@@ -175,4 +175,37 @@ export const pluginRouter = createTRPCRouter({
         });
         return { success: true };
     }),
+    getPluginsById: publicProcedure.input(z.object({ id: z.string() })).query(async ({ ctx, input }) => {
+        const pluginsQuery = await ctx.db
+            .select({
+                pluginId: plugins.id,
+                name: plugins.name,
+                appConfig: plugins.appConfig,
+                upvotes: sql<number>`SUM(CASE WHEN ${votes.value} = 1 THEN 1 ELSE 0 END)`,
+                downvotes: sql<number>`SUM(CASE WHEN ${votes.value} = -1 THEN 1 ELSE 0 END)`,
+                total: sql<number>`COALESCE(SUM(${votes.value}), 0)`,
+                userVote: ctx.session?.user.id
+                    ? sql<
+                          number | null
+                      >`MAX(CASE WHEN ${votes.createdById} = ${ctx.session.user.id} THEN ${votes.value} ELSE NULL END)`
+                    : sql<number | null>`NULL`,
+                categories: plugins.category,
+            })
+            .from(plugins)
+            .where(eq(plugins.createdById, input.id))
+            .leftJoin(votes, eq(votes.pluginId, plugins.id))
+            .groupBy(plugins.id, plugins.name, plugins.appConfig)
+            .orderBy(desc(sql`COALESCE(SUM(${votes.value}), 0)`), asc(plugins.id)); // keep cursor-compatible ordering
+
+        const configs = await Promise.all(
+            pluginsQuery.map(row => (row.appConfig ? fetchAlt1Config(row.appConfig) : Promise.resolve(null)))
+        );
+
+        const pluginsWithConfig = pluginsQuery.map((row, i) => ({
+            data: row,
+            appConfig: configs[i],
+        }));
+
+        return pluginsWithConfig;
+    }),
 });

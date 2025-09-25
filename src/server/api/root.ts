@@ -1,6 +1,7 @@
 import { createCallerFactory, createTRPCRouter } from '~/server/api/trpc';
 import { pluginRouter } from './routers/plugin';
 import { voteManagementRouter } from './routers/voteManagement';
+import { userRouter } from './routers/user';
 
 /**
  * This is the primary router for your server.
@@ -10,6 +11,7 @@ import { voteManagementRouter } from './routers/voteManagement';
 export const appRouter = createTRPCRouter({
     plugin: pluginRouter,
     votes: voteManagementRouter,
+    user: userRouter,
 });
 
 // export type definition of API

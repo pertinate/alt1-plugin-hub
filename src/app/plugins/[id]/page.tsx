@@ -125,7 +125,12 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                             <div className='flex flex-col gap-4'>
                                 <div className='flex flex-col gap-2'>
                                     <Label className='text-md font-extrabold'>Author</Label>
-                                    <Label className='text-xlg font-extralight'>{plugin.createByUser}</Label>
+                                    <Link
+                                        href={`/plugins/author/${plugin.createdById}`}
+                                        className='text-blue-600 hover:underline'
+                                    >
+                                        <Label className='text-xlg font-extralight'>{plugin.createByUser}</Label>
+                                    </Link>
                                 </div>
                                 <div className='flex flex-col gap-2'>
                                     <Label className='text-md font-extrabold'>Categories</Label>

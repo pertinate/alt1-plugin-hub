@@ -14,6 +14,10 @@ export const getPlugin = cache(async (id: number) => {
     return await api.plugin.getPlugin(id);
 });
 
+export const getUser = cache(async (id: string) => {
+    return await api.user.getUserById({ id });
+});
+
 export function isUrl(path: string): boolean {
     try {
         const url = new URL(path);
