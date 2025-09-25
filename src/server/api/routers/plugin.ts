@@ -125,7 +125,7 @@ export const pluginRouter = createTRPCRouter({
                     appConfig: plugins.appConfig,
                     upvotes: sql<number>`SUM(CASE WHEN ${votes.value} = 1 THEN 1 ELSE 0 END)`,
                     downvotes: sql<number>`SUM(CASE WHEN ${votes.value} = -1 THEN 1 ELSE 0 END)`,
-                    total: sql<number>`SUM(${votes.value})`,
+                    total: sql<number>`COALESCE(SUM(${votes.value}), 0)`,
                     userVote: ctx.session?.user.id
                         ? sql<
                               number | null
@@ -137,7 +137,7 @@ export const pluginRouter = createTRPCRouter({
                 .where(conditions.length ? and(...conditions) : undefined)
                 .leftJoin(votes, eq(votes.pluginId, plugins.id))
                 .groupBy(plugins.id, plugins.name, plugins.appConfig)
-                .orderBy(desc(sql`SUM(${votes.value})`), asc(plugins.id)) // keep cursor-compatible ordering
+                .orderBy(desc(sql`COALESCE(SUM(${votes.value}), 0)`), asc(plugins.id)) // keep cursor-compatible ordering
                 .limit(limit + 1);
 
             const rows = await pluginsQuery;
