@@ -23,7 +23,7 @@ export default async function Home() {
         },
     ];
 
-    void (await api.plugin.getPlugins.prefetchInfinite({ limit: 12 }));
+    void (await api.plugin.getPlugins.prefetchInfinite({ limit: 12, search: '', categories: [] }));
 
     return (
         <HydrateClient>
