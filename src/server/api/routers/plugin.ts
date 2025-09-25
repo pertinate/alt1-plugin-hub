@@ -96,7 +96,6 @@ export const pluginRouter = createTRPCRouter({
             const conditions = [];
 
             if (cursor) {
-                // conditions.push(gt(plugins.id, cursor));
                 conditions.push(
                     or(
                         sql`( SUM(${votes.value}) < ${cursor.total} )`,
@@ -138,12 +137,10 @@ export const pluginRouter = createTRPCRouter({
                 .where(conditions.length ? and(...conditions) : undefined)
                 .leftJoin(votes, eq(votes.pluginId, plugins.id))
                 .groupBy(plugins.id, plugins.name, plugins.appConfig)
-                .orderBy(asc(sql`SUM(${votes.value})`), asc(plugins.id)) // keep cursor-compatible ordering
+                .orderBy(desc(sql`SUM(${votes.value})`), asc(plugins.id)) // keep cursor-compatible ordering
                 .limit(limit + 1);
 
             const rows = await pluginsQuery;
-
-            console.log(rows);
 
             let nextCursor: { total: number; pluginId: number } | null = null;
             if (rows.length > limit) {
