@@ -36,8 +36,6 @@ export default function PluginList() {
 
     const allCategoriesSet = new Set(selectedCategories.map(([name]) => name));
 
-    console.log(allCategoriesSet, Array.from(allCategoriesSet));
-
     const plugins = api.plugin.getPlugins.useInfiniteQuery(
         { limit: 12, search, categories: Array.from(allCategoriesSet) },
         { getNextPageParam: lastPage => lastPage.nextCursor }

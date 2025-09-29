@@ -98,7 +98,6 @@ export async function isMarkdownUrl(url: string) {
 
         // Option A: check Content-Type
         const type = res.headers.get('content-type') ?? '';
-        console.log(type);
         if (type.includes('text/markdown') || type.includes('text/plain')) return true;
 
         return false;
@@ -114,7 +113,6 @@ export async function isValidJsonUrl(url: string) {
         await res.json(); // throws if not valid JSON
         return true;
     } catch (error) {
-        console.error(error);
         return false; // prevent mutation
     }
 }

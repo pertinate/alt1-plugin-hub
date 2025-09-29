@@ -44,5 +44,4 @@ export default async function Page() {
             </main>
         </HydrateClient>
     );
-    // return <div>My Post: {name}</div>;
 }

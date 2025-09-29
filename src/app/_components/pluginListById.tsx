@@ -37,8 +37,6 @@ export default function PluginListById({ id }: { id: string }) {
 
     const allCategoriesSet = new Set(selectedCategories.map(([name]) => name));
 
-    console.log(allCategoriesSet, Array.from(allCategoriesSet));
-
     const plugins = api.plugin.getPluginsById.useQuery({ id });
 
     function toggleCategory(name: string) {
