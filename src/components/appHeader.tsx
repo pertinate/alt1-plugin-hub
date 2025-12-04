@@ -7,6 +7,7 @@ import { auth } from '~/server/auth';
 import { SignOutBtn } from './signOutBtn';
 import AddToAlt1 from './addToAlt1';
 import OpenInBrowser from './openInBrowser';
+import { SetNickName } from './setNickName';
 
 export const AppHeader = async () => {
     const session = await auth();
@@ -43,6 +44,7 @@ export const AppHeader = async () => {
                         <DropdownMenuItem>
                             <OpenInBrowser />
                         </DropdownMenuItem>
+                        {session && <SetNickName />}
                     </DropdownMenuContent>
                 </DropdownMenu>
                 <ThemeToggle />

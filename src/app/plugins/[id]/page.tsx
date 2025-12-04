@@ -129,7 +129,9 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                                         href={`/plugins/author/${plugin.createdById}`}
                                         className='text-blue-600 hover:underline'
                                     >
-                                        <Label className='text-xlg font-extralight'>{plugin.createByUser}</Label>
+                                        <Label className='text-xlg font-extralight'>
+                                            {plugin.createByNickName ?? plugin.createByUser}
+                                        </Label>
                                     </Link>
                                 </div>
                                 <div className='flex flex-col gap-2'>

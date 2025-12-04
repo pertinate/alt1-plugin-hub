@@ -98,6 +98,7 @@ export const users = createTable('user', d => ({
         .primaryKey()
         .$defaultFn(() => crypto.randomUUID()),
     name: d.varchar({ length: 255 }),
+    nickName: d.varchar({ length: 255 }),
     email: d.varchar({ length: 255 }),
     emailVerified: d
         .timestamp({
@@ -108,6 +109,14 @@ export const users = createTable('user', d => ({
     image: d.varchar({ length: 255 }),
     username: d.varchar({ length: 255 }),
     disabled: d.boolean(),
+}));
+
+export const bans = createTable("bans", d => ({
+  id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+  userId: d.varchar({ length: 255 }).notNull().references(() => users.id),
+  reason: d.text(),
+  createdAt: d.timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
+  bannedById: d.varchar({ length: 255 }).references(() => users.id),
 }));
 
 export const usersRelations = relations(users, ({ many }) => ({

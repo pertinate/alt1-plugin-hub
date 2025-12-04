@@ -1,4 +1,5 @@
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
+import { eq, isNull, or } from 'drizzle-orm';
 import { type DefaultSession, type NextAuthConfig } from 'next-auth';
 import DiscordProvider from 'next-auth/providers/discord';
 
@@ -58,5 +59,12 @@ export const authConfig = {
                 id: user.id,
             },
         }),
+    },
+    events: {
+        async createUser(message) {
+            if (message.user.id) {
+                await db.update(users).set({ nickName: message.user.name }).where(eq(users.id, message.user.id));
+            }
+        },
     },
 } satisfies NextAuthConfig;

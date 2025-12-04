@@ -6,7 +6,7 @@ import type { Alt1Config } from '~/lib/alt1';
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '~/server/api/trpc';
 import { createPlugin } from '../../../dataGroups/createPlugin';
 import { pluginMetadata, plugins, users, votes } from '~/server/db/schema';
-import { and, asc, desc, eq, gt, ilike, lt, or, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, ilike, isNull, lt, or, sql } from 'drizzle-orm';
 import { fetchAlt1Config } from '~/util/fetchAlt1Config';
 import { updatePlugin } from '../../../dataGroups/updatePlugin';
 import { metadata } from '~/app/layout';
@@ -56,19 +56,22 @@ export const pluginRouter = createTRPCRouter({
                 createdAt: plugins.createdAt,
                 updatedAt: plugins.updatedAt,
                 metadata: sql<{ id: number; type: string; name: string; value: string }[]>`
-                coalesce(
-                    json_agg(
-                    json_build_object(
-                        'id', ${pluginMetadata.id},
-                        'type', ${pluginMetadata.type},
-                        'name', ${pluginMetadata.name},
-                        'value', ${pluginMetadata.value}
-                    )
-                    ) filter (where ${pluginMetadata.id} is not null),
-                    '[]'
-                )
-                `,
+        coalesce(
+            json_agg(
+            json_build_object(
+                'id', ${pluginMetadata.id},
+                'type', ${pluginMetadata.type},
+                'name', ${pluginMetadata.name},
+                'value', ${pluginMetadata.value}
+            )
+            ) filter (where ${pluginMetadata.id} is not null),
+            '[]'
+        )
+        `,
                 createByUser: users.name,
+                createByNickName: sql<string>`
+            (SELECT ${users.nickName} FROM ${users} WHERE ${users.id} = ${plugins.createdById} LIMIT 1)
+        `,
             })
             .from(plugins)
             .leftJoin(pluginMetadata, eq(pluginMetadata.pluginId, plugins.id))
@@ -83,7 +86,7 @@ export const pluginRouter = createTRPCRouter({
                 cursor: z
                     .object({
                         total: z.number(),
-                        pluginId: z.number(),
+                        plugins: z.string(),
                     })
                     .nullish(),
                 search: z.string(),
@@ -93,24 +96,21 @@ export const pluginRouter = createTRPCRouter({
         .query(async ({ ctx, input }) => {
             const { limit, cursor, search, categories } = input;
 
-            const conditions = [];
+            const whereConditions = [];
+            const havingConditions = [];
 
             if (cursor) {
-                conditions.push(
-                    or(
-                        sql`( SUM(${votes.value}) < ${cursor.total} )`,
-                        and(sql`( SUM(${votes.value}) = ${cursor.total} )`, sql`${plugins.id} > ${cursor.pluginId}`)
-                    )
-                );
+                havingConditions.push(sql`( SUM(${votes.value}) <= ${cursor.total})`);
+                whereConditions.push(sql`${plugins.id} not in (${sql.join(cursor.plugins.split(','), sql`,`)})`);
             }
 
             if (search) {
-                conditions.push(ilike(plugins.name, `%${search}%`));
+                whereConditions.push(ilike(plugins.name, `%${search}%`));
             }
 
             if (categories?.length > 0) {
                 console.log(categories, sql`${plugins.category} @> ${categories}::text[]`);
-                conditions.push(
+                whereConditions.push(
                     sql`${plugins.category} @> ARRAY[${sql.join(
                         categories.map(c => sql`${c}`),
                         sql`, `
@@ -134,9 +134,10 @@ export const pluginRouter = createTRPCRouter({
                     categories: plugins.category,
                 })
                 .from(plugins)
-                .where(conditions.length ? and(...conditions) : undefined)
+                .where(whereConditions.length ? and(...whereConditions) : undefined)
                 .leftJoin(votes, eq(votes.pluginId, plugins.id))
                 .groupBy(plugins.id, plugins.name, plugins.appConfig)
+                .having(havingConditions.length ? and(...havingConditions) : undefined)
                 .orderBy(desc(sql`COALESCE(SUM(${votes.value}), 0)`), asc(plugins.id)) // keep cursor-compatible ordering
                 .limit(limit + 1);
 

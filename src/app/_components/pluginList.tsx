@@ -38,7 +38,16 @@ export default function PluginList() {
 
     const plugins = api.plugin.getPlugins.useInfiniteQuery(
         { limit: 12, search, categories: Array.from(allCategoriesSet) },
-        { getNextPageParam: lastPage => lastPage.nextCursor }
+        {
+            getNextPageParam: lastPage =>
+                lastPage.nextCursor
+                    ? {
+                          ...lastPage.nextCursor,
+                          total: Number(lastPage.plugins[lastPage.plugins.length - 1]?.data.total) ?? -1,
+                          plugins: lastPage.plugins.map(entry => entry.data.pluginId).join(','),
+                      }
+                    : undefined,
+        }
     );
 
     function toggleCategory(name: string) {
